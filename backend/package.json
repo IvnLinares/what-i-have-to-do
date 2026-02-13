@@ -16,7 +16,8 @@
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
