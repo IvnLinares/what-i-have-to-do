@@ -109,6 +109,9 @@
       </form>
     </section>
 
+    <!-- Advanced Search & Filter Component -->
+    <TaskSearch />
+
     <!-- CALENDAR VIEW -->
     <TaskCalendar
         v-if="viewMode === 'calendar'"
@@ -120,15 +123,6 @@
     <section v-if="viewMode === 'list'" class="task-list">
       <div class="list-header">
         <h2>📋 Lista de Tareas</h2>
-
-        <div class="filters">
-            <select v-model="store.categoryFilter" class="filter-select">
-                <option :value="null">Todas las Categorías</option>
-                <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.id">
-                    {{ cat.name }}
-                </option>
-            </select>
-        </div>
 
         <div class="stats" v-if="store.tasks.length">
             <span class="badge">Pendientes: {{ store.pendingTasksCount }}</span>
@@ -233,6 +227,7 @@ import { useTagStore } from '../stores/tagStore'
 import CategoryManager from './CategoryManager.vue'
 import TagManager from './TagManager.vue'
 import TaskCalendar from './TaskCalendar.vue'
+import TaskSearch from './TaskSearch.vue'
 
 const store = useTaskStore()
 const categoryStore = useCategoryStore()

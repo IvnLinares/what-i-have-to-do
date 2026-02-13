@@ -6,23 +6,37 @@ export const useTaskStore = defineStore('task', {
     tasks: [],
     loading: false,
     error: null,
+    // Filters state
+    searchQuery: '',
     filter: 'all', // 'all', 'active', 'completed'
     categoryFilter: null,
-    tagFilter: [] // array of tag IDs
+    priorityFilter: [], // ['low', 'medium', 'high']
+    tagFilter: [], // array of tag IDs
+    sortOption: 'smart' // 'smart', 'date-desc', 'date-asc', 'priority-desc', 'priority-asc', 'alpha-asc'
   }),
   getters: {
     // Filtered tasks based on state filters
     filteredTasks(state) {
       return state.tasks.filter(t => {
+        // Search Query (Title or Description)
+        if (state.searchQuery) {
+            const query = state.searchQuery.toLowerCase()
+            const matchTitle = t.title.toLowerCase().includes(query)
+            const matchDesc = t.description && t.description.toLowerCase().includes(query)
+            if (!matchTitle && !matchDesc) return false
+        }
+
         // Status Filter
         if (state.filter === 'active' && t.completed) return false
         if (state.filter === 'completed' && !t.completed) return false
 
         // Category Filter
-        // Use loose equality as select input might be string while category_id is number
         if (state.categoryFilter && t.category_id != state.categoryFilter) return false
 
-        // Tag Filter (if any selected tag is present)
+        // Priority Filter
+        if (state.priorityFilter.length > 0 && !state.priorityFilter.includes(t.priority)) return false
+
+        // Tag Filter
         if (state.tagFilter.length > 0) {
           if (!t.tags || t.tags.length === 0) return false
           const taskTagIds = t.tags.map(tag => tag.id)
@@ -35,43 +49,46 @@ export const useTaskStore = defineStore('task', {
     },
     // Sorted version of filtered tasks
     sortedTasks(state) {
-      // Access other getters via 'this' in Options API
-      // But getters receive state as first argument.
-      // To access other getters, we must use `this` and define function normally (not arrow).
-      // However, pinia getters: (state) => ... OR function() { return this.otherGetter }
-
       const priorityWeight = { high: 3, medium: 2, low: 1 }
-
-      // We use `this.filteredTasks` because filteredTasks is a getter.
-      // If we use state directly, we bypass filtering.
-      // But getters are computed properties on the store instance.
       const tasks = this.filteredTasks || []
 
       return [...tasks].sort((a, b) => {
-        // 1. Completed tasks go to bottom
+        // Always sort completed to bottom regardless of sort option, unless specifically sorting by status (not implemented)
+        // But users might want to see completed tasks sorted by date too.
+        // Let's keep the "completed at bottom" logic for 'smart' sort, maybe relax for others?
+        // For now, let's keep it consistent: Completed always last.
         if (a.completed !== b.completed) {
             return a.completed ? 1 : -1
         }
 
-        // 2. Sort by due date (soonest first)
-        // Only if both have due dates.
-        // If one has due date and other doesn't?
-        // Let's prioritize due date if exists and overdue or soon.
-        if (a.due_date && b.due_date) {
-            return new Date(a.due_date) - new Date(b.due_date)
-        }
-        if (a.due_date && !b.due_date) return -1 // a comes first
-        if (!a.due_date && b.due_date) return 1 // b comes first
+        switch (state.sortOption) {
+            case 'date-desc':
+                return new Date(b.created_at) - new Date(a.created_at)
+            case 'date-asc':
+                return new Date(a.created_at) - new Date(b.created_at)
+            case 'priority-desc': // High to Low
+                return (priorityWeight[b.priority] || 0) - (priorityWeight[a.priority] || 0)
+            case 'priority-asc': // Low to High
+                return (priorityWeight[a.priority] || 0) - (priorityWeight[b.priority] || 0)
+            case 'alpha-asc':
+                return a.title.localeCompare(b.title)
+            case 'smart':
+            default:
+                // 1. Due Date (soonest first)
+                if (a.due_date && b.due_date) {
+                    return new Date(a.due_date) - new Date(b.due_date)
+                }
+                if (a.due_date && !b.due_date) return -1
+                if (!a.due_date && b.due_date) return 1
 
-        // 3. Sort by priority (descending weight)
-        const pA = priorityWeight[a.priority] || 2
-        const pB = priorityWeight[b.priority] || 2
-        if (pA !== pB) {
-            return pB - pA
-        }
+                // 2. Priority
+                const pA = priorityWeight[a.priority] || 2
+                const pB = priorityWeight[b.priority] || 2
+                if (pA !== pB) return pB - pA
 
-        // 4. Sort by date (newest first)
-        return new Date(b.created_at) - new Date(a.created_at)
+                // 3. Created Date (newest first)
+                return new Date(b.created_at) - new Date(a.created_at)
+        }
       })
     },
     pendingTasksCount: (state) => state.tasks.filter(t => !t.completed).length,
@@ -79,8 +96,6 @@ export const useTaskStore = defineStore('task', {
         const now = new Date()
         return state.tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) < now).length
     },
-
-    // Stats: Tasks by Category
     tasksByCategory(state) {
       const stats = {}
       state.tasks.forEach(task => {
@@ -89,9 +104,24 @@ export const useTaskStore = defineStore('task', {
         stats[catName]++
       })
       return stats
+    },
+    // Autocomplete suggestions
+    searchSuggestions(state) {
+        if (!state.searchQuery || state.searchQuery.length < 2) return []
+        const query = state.searchQuery.toLowerCase()
+        return state.tasks
+            .filter(t => t.title.toLowerCase().includes(query))
+            .map(t => t.title)
+            .slice(0, 5) // Limit to 5 suggestions
     }
   },
   actions: {
+    setSearchQuery(query) {
+        this.searchQuery = query
+    },
+    setSortOption(option) {
+        this.sortOption = option
+    },
     async fetchTasks() {
       this.loading = true
       this.error = null
