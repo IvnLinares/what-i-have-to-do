@@ -16,7 +16,8 @@
     "axios": "^1.12.2",
     "pinia": "^3.0.4",
     "vue": "^3.5.22",
-    "vue-router": "^5.0.2"
+    "vue-router": "^5.0.2",
+    "vuedraggable": "^4.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^6.0.1",

@@ -1,25 +1,28 @@
 <template>
   <div class="task-manager">
 
-    <div class="top-controls">
+    <div class="top-controls card glass-panel">
         <div class="view-toggle">
-            <button @click="viewMode = 'list'" class="btn" :class="{ active: viewMode === 'list' }">📋 Lista</button>
-            <button @click="viewMode = 'calendar'" class="btn" :class="{ active: viewMode === 'calendar' }">📅 Calendario</button>
+            <button @click="viewMode = 'list'" class="btn-toggle" :class="{ active: viewMode === 'list' }">📋 Lista</button>
+            <button @click="viewMode = 'grid'" class="btn-toggle" :class="{ active: viewMode === 'grid' }">🍱 Grid</button>
+            <button @click="viewMode = 'calendar'" class="btn-toggle" :class="{ active: viewMode === 'calendar' }">📅 Calendario</button>
         </div>
 
         <div class="settings-toggle">
             <button @click="showSettings = !showSettings" class="btn btn-secondary">
-                {{ showSettings ? 'Ocultar Configuración' : '⚙️ Gestionar Categorías y Etiquetas' }}
+                {{ showSettings ? 'Ocultar Config' : '⚙️ Configuración' }}
             </button>
         </div>
     </div>
 
-    <div v-if="showSettings" class="settings-panel">
-      <CategoryManager />
-      <TagManager />
-    </div>
+    <transition name="fade">
+        <div v-if="showSettings" class="settings-panel">
+            <CategoryManager />
+            <TagManager />
+        </div>
+    </transition>
 
-    <!-- Task Form (always visible) -->
+    <!-- Task Form -->
     <section class="task-form card">
       <h2>{{ editingTask ? 'Editar Tarea' : 'Nueva Tarea' }}</h2>
       <form @submit.prevent="handleSubmit">
@@ -37,24 +40,24 @@
           <textarea
             v-model="form.description"
             placeholder="Descripción (opcional)"
-            rows="3"
+            rows="2"
             class="input-field"
           ></textarea>
         </div>
 
         <div class="form-row">
           <div class="form-group half">
-            <label for="priority">Prioridad:</label>
-            <select v-model="form.priority" id="priority" class="select-field">
-              <option value="low">Baja 🟢</option>
-              <option value="medium">Media 🟠</option>
-              <option value="high">Alta 🔴</option>
+            <label>Prioridad</label>
+            <select v-model="form.priority" class="select-field">
+              <option value="low">🟢 Baja</option>
+              <option value="medium">🟠 Media</option>
+              <option value="high">🔴 Alta</option>
             </select>
           </div>
 
           <div class="form-group half">
-            <label for="category">Categoría:</label>
-            <select v-model="form.category_id" id="category" class="select-field">
+            <label>Categoría</label>
+            <select v-model="form.category_id" class="select-field">
               <option :value="null">Sin Categoría</option>
               <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.id">
                 {{ cat.name }}
@@ -64,17 +67,16 @@
         </div>
 
         <div class="form-group">
-            <label for="due_date">Fecha de Vencimiento:</label>
+            <label>Vencimiento</label>
             <input
                 v-model="form.due_date"
                 type="datetime-local"
-                id="due_date"
                 class="input-field"
             />
         </div>
 
         <div class="form-group">
-          <label>Etiquetas:</label>
+          <label>Etiquetas</label>
           <div class="tags-input">
             <span
               v-for="tag in tagStore.tags"
@@ -95,7 +97,7 @@
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" :disabled="store.loading">
-            {{ editingTask ? '💾 Actualizar' : '✨ Crear Tarea' }}
+            {{ editingTask ? '💾 Guardar' : '✨ Crear' }}
           </button>
           <button
             v-if="editingTask"
@@ -103,13 +105,13 @@
             @click="cancelEdit"
             class="btn btn-secondary"
           >
-            ❌ Cancelar
+            ❌
           </button>
         </div>
       </form>
     </section>
 
-    <!-- Advanced Search & Filter Component -->
+    <!-- Search Component -->
     <TaskSearch />
 
     <!-- CALENDAR VIEW -->
@@ -119,108 +121,83 @@
         @edit-task="startEdit"
     />
 
-    <!-- LIST VIEW -->
-    <section v-if="viewMode === 'list'" class="task-list">
+    <!-- LIST / GRID VIEW -->
+    <section v-else class="task-view-container">
       <div class="list-header">
-        <h2>📋 Lista de Tareas</h2>
-
-        <div class="stats" v-if="store.tasks.length">
+        <h2>📋 Tareas</h2>
+        <div class="stats">
             <span class="badge">Pendientes: {{ store.pendingTasksCount }}</span>
             <span class="badge badge-danger" v-if="store.overdueTasksCount > 0">Vencidas: {{ store.overdueTasksCount }}</span>
         </div>
       </div>
 
-      <!-- Statistics Section -->
-      <div v-if="Object.keys(store.tasksByCategory).length > 0" class="stats-bar">
-         <div v-for="(count, catName) in store.tasksByCategory" :key="catName" class="stat-item">
-            <strong>{{ catName }}:</strong> {{ count }}
-         </div>
-      </div>
+      <div v-if="store.loading && !store.tasks.length" class="loading">Cargando...</div>
 
-      <div v-if="store.loading && !store.tasks.length" class="loading">Cargando tareas...</div>
-      <div v-else-if="store.error" class="error">{{ store.error }}</div>
-      <div v-else-if="store.filteredTasks.length === 0" class="empty">
-        No hay tareas que coincidan con los filtros.
-      </div>
+      <div v-else class="tasks-container" :class="viewMode">
+        <draggable
+            v-model="localTasks"
+            item-key="id"
+            class="drag-area"
+            :class="viewMode"
+            @end="onDragEnd"
+            handle=".drag-handle"
+        >
+            <template #item="{ element: task }">
+                <div
+                    class="task-item card"
+                    :class="{
+                        completed: task.completed,
+                        [`priority-${task.priority}`]: true,
+                        overdue: isOverdue(task)
+                    }"
+                    :style="task.category ? { borderRight: `5px solid ${task.category.color}` } : {}"
+                >
+                    <div class="drag-handle" title="Arrastrar para reordenar">⋮⋮</div>
 
-      <div v-else class="tasks-container">
-        <TransitionGroup name="list" tag="div" class="tasks">
-          <div
-            v-for="task in store.sortedTasks"
-            :key="task.id"
-            class="task-item card"
-            :class="{
-                completed: task.completed,
-                [`priority-${task.priority}`]: true,
-                overdue: isOverdue(task)
-            }"
-            :style="task.category ? { borderRight: `5px solid ${task.category.color}` } : {}"
-          >
-            <div class="task-content">
-              <div class="task-header">
-                <h3>{{ task.title }}</h3>
-                <div class="badges">
-                    <span v-if="isOverdue(task)" class="badge-danger-pill">⚠️ Vencida</span>
-                    <span class="priority-badge" :class="task.priority">
-                    {{ getPriorityLabel(task.priority) }}
-                    </span>
-                    <span v-if="task.category" class="category-badge" :style="{ backgroundColor: task.category.color }">
-                        {{ task.category.name }}
-                    </span>
+                    <div class="task-content">
+                        <div class="task-header">
+                            <h3>{{ task.title }}</h3>
+                            <div class="badges">
+                                <span v-if="isOverdue(task)" class="badge-danger-pill">⚠️</span>
+                                <span class="priority-dot" :class="task.priority" :title="'Prioridad ' + task.priority"></span>
+                            </div>
+                        </div>
+
+                        <span v-if="task.category" class="category-pill" :style="{ backgroundColor: task.category.color + '30', color: task.category.color }">
+                            {{ task.category.name }}
+                        </span>
+
+                        <p v-if="task.description">{{ task.description }}</p>
+
+                        <div class="meta-info">
+                            <small v-if="task.due_date" class="due-date" :class="{ 'text-danger': isOverdue(task) }">
+                                📅 {{ formatDateTime(task.due_date) }}
+                            </small>
+                        </div>
+
+                        <div class="task-tags">
+                            <span v-for="tag in task.tags" :key="tag.id" class="tag-dot" :style="{ backgroundColor: tag.color }" :title="tag.name"></span>
+                        </div>
+                    </div>
+
+                    <div class="task-actions">
+                        <button @click.stop="store.updateTask(task.id, { completed: !task.completed })" class="btn-icon">
+                            {{ task.completed ? '↩️' : '✅' }}
+                        </button>
+                        <button @click.stop="startEdit(task)" class="btn-icon">✏️</button>
+                        <button @click.stop="confirmDelete(task.id)" class="btn-icon btn-danger">🗑️</button>
+                    </div>
                 </div>
-              </div>
-              <p v-if="task.description">{{ task.description }}</p>
-
-              <div class="meta-info">
-                  <small v-if="task.due_date" class="due-date" :class="{ 'text-danger': isOverdue(task) }">
-                      📅 Vence: {{ formatDateTime(task.due_date) }}
-                  </small>
-                  <small>📝 Creada: {{ formatDate(task.created_at) }}</small>
-              </div>
-
-              <div class="task-tags" v-if="task.tags && task.tags.length">
-                  <span
-                    v-for="tag in task.tags"
-                    :key="tag.id"
-                    class="tag-mini"
-                    :style="{ color: tag.color, borderColor: tag.color, backgroundColor: tag.color + '15' }"
-                  >
-                    #{{ tag.name }}
-                  </span>
-              </div>
-            </div>
-            <div class="task-actions">
-              <button
-                @click="store.updateTask(task.id, { completed: !task.completed })"
-                class="btn-icon"
-                :title="task.completed ? 'Marcar como pendiente' : 'Marcar como completada'"
-              >
-                {{ task.completed ? '↩️' : '✅' }}
-              </button>
-              <button
-                @click="startEdit(task)"
-                class="btn-icon"
-                title="Editar tarea"
-              >
-                ✏️
-              </button>
-              <button
-                @click="confirmDelete(task.id)"
-                class="btn-icon btn-danger"
-                title="Eliminar tarea"
-              >
-                🗑️
-              </button>
-            </div>
-          </div>
-        </TransitionGroup>
+            </template>
+        </draggable>
       </div>
     </section>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
+import draggable from 'vuedraggable'
 import { useTaskStore } from '../stores/taskStore'
 import { useCategoryStore } from '../stores/categoryStore'
 import { useTagStore } from '../stores/tagStore'
@@ -234,18 +211,27 @@ const categoryStore = useCategoryStore()
 const tagStore = useTagStore()
 
 const showSettings = ref(false)
-const viewMode = ref('list') // 'list' or 'calendar'
+const viewMode = ref('list')
+const form = ref({ title: '', description: '', priority: 'medium', category_id: null, tags: [], due_date: '' })
+const editingTask = ref(null)
 
-const form = ref({
-  title: '',
-  description: '',
-  priority: 'medium',
-  category_id: null,
-  tags: [],
-  due_date: ''
+// Local sorted tasks for Draggable (two-way binding requires a writable computed/ref)
+// We sync it from store initially, but draggable updates it locally.
+// Ideally, we'd update store order, but we don't have DB ordering yet.
+// So we just use store.sortedTasks for display, and handle drag visually.
+const localTasks = computed({
+    get: () => store.sortedTasks,
+    set: (val) => {
+        // In a real app with manual ordering, we would update the store/DB order here.
+        // For now, we just acknowledge the change visually.
+        // Because sortedTasks is a getter derived from state, we can't set it directly.
+        // We might need a separate 'manual' sort mode for this to really work effectively.
+    }
 })
 
-const editingTask = ref(null)
+const onDragEnd = () => {
+    // console.log("Drag ended", localTasks.value)
+}
 
 onMounted(() => {
   store.fetchTasks()
@@ -255,30 +241,19 @@ onMounted(() => {
 
 const toggleTag = (tagId) => {
   const index = form.value.tags.indexOf(tagId)
-  if (index === -1) {
-    form.value.tags.push(tagId)
-  } else {
-    form.value.tags.splice(index, 1)
-  }
+  if (index === -1) form.value.tags.push(tagId)
+  else form.value.tags.splice(index, 1)
 }
 
 const handleSubmit = async () => {
   if (!form.value.title.trim()) return
-
-  // Format date to ISO string if present
-  const payload = { ...form.value }
-  if (payload.due_date) {
-      payload.due_date = new Date(payload.due_date).toISOString()
-  } else {
-      payload.due_date = null
-  }
+  const payload = { ...form.value, due_date: form.value.due_date ? new Date(form.value.due_date).toISOString() : null }
 
   if (editingTask.value) {
     await store.updateTask(editingTask.value.id, payload)
     cancelEdit()
   } else {
     await store.addTask(payload)
-    // Reset form
     form.value = { title: '', description: '', priority: 'medium', category_id: null, tags: [], due_date: '' }
   }
 }
@@ -309,325 +284,184 @@ const cancelEdit = () => {
 }
 
 const confirmDelete = async (id) => {
-  if (confirm('¿Estás seguro de que quieres eliminar esta tarea?')) {
-    await store.removeTask(id)
-  }
-}
-
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  return date.toLocaleDateString('es-ES', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  })
+  if (confirm('¿Eliminar?')) await store.removeTask(id)
 }
 
 const formatDateTime = (dateString) => {
   const date = new Date(dateString)
-  return date.toLocaleString('es-ES', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  return date.toLocaleString('es-ES', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
 }
 
-const getPriorityLabel = (priority) => {
-  const labels = {
-    low: 'Baja',
-    medium: 'Media',
-    high: 'Alta'
-  }
-  return labels[priority] || priority
-}
+const getPriorityLabel = (priority) => ({ low: 'Baja', medium: 'Media', high: 'Alta' }[priority] || priority)
 
-const isOverdue = (task) => {
-    if (task.completed || !task.due_date) return false
-    return new Date(task.due_date) < new Date()
-}
+const isOverdue = (task) => !task.completed && task.due_date && new Date(task.due_date) < new Date()
 </script>
 
 <style scoped>
-/* Same styles as before plus... */
-.task-manager {
-  max-width: 800px;
-  margin: 0 auto;
+.task-manager { max-width: 900px; margin: 0 auto; }
+
+.glass-panel {
+    background: var(--surface-color);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--surface-border);
 }
 
 .top-controls {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
 }
 
 .view-toggle {
     display: flex;
     gap: 0.5rem;
-}
-
-.view-toggle .btn {
-    padding: 0.5rem 1rem;
-    background-color: var(--surface-color);
-    color: var(--text-color);
-    border: 1px solid var(--border-color);
-}
-
-.view-toggle .btn.active {
-    background-color: var(--primary-color);
-    color: white;
-    border-color: var(--primary-color);
-}
-
-.settings-panel {
-    margin-bottom: 2rem;
-}
-
-.card {
-  background: var(--surface-color);
-  border-radius: 12px;
-  padding: 1.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.task-form {
-  margin-bottom: 2rem;
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
-}
-
-.input-field, .select-field {
-  width: 100%;
-  padding: 0.8rem;
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  background: var(--bg-color);
-  color: var(--text-color);
-  font-size: 1rem;
-  margin-bottom: 1rem;
-}
-
-.form-row {
-    display: flex;
-    gap: 1rem;
-}
-.half {
-    flex: 1;
-}
-
-.form-group {
-    margin-bottom: 1rem;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 0.5rem;
-    font-weight: bold;
-}
-
-.tags-input {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-
-.select-tag {
-    cursor: pointer;
-    user-select: none;
-    transition: all 0.2s;
-}
-
-.form-actions {
-  display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-.btn {
-  padding: 0.8rem 1.5rem;
-  border-radius: 8px;
-  border: none;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.btn-primary {
-  background-color: var(--primary-color);
-  color: white;
-}
-.btn-primary:hover {
-  background-color: var(--primary-hover);
-}
-.btn-secondary {
-  background-color: var(--secondary-color);
-  color: white;
-}
-
-.list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.filters {
-    flex: 1;
-}
-.filter-select {
-    padding: 0.5rem;
-    border-radius: 6px;
-    border: 1px solid var(--border-color);
     background: var(--bg-color);
-    color: var(--text-color);
+    padding: 0.3rem;
+    border-radius: 12px;
 }
 
-.stats-bar {
-    display: flex;
-    gap: 1rem;
+.btn-toggle {
+    border: none;
+    background: transparent;
     padding: 0.5rem 1rem;
-    background: var(--bg-color);
     border-radius: 8px;
-    margin-bottom: 1rem;
-    font-size: 0.9rem;
-    flex-wrap: wrap;
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--text-muted);
+    transition: all 0.3s ease;
+}
+
+.btn-toggle.active {
+    background: var(--surface-color);
+    color: var(--primary-color);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.task-form { margin-bottom: 2rem; }
+
+.form-row { display: flex; gap: 1rem; }
+.half { flex: 1; }
+.form-group { margin-bottom: 1rem; }
+.input-field, .select-field {
+    width: 100%; padding: 0.8rem;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-color);
+    color: var(--text-color);
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+.input-field:focus { border-color: var(--primary-color); outline: none; }
+
+.tags-input { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.tag-pill {
+    padding: 0.3rem 0.8rem; border-radius: 20px; border: 1px solid;
+    cursor: pointer; transition: all 0.2s; font-size: 0.85rem;
+}
+.tag-pill.selected { transform: scale(1.05); }
+
+.form-actions { display: flex; gap: 1rem; margin-top: 1rem; }
+.btn { padding: 0.8rem 1.5rem; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.btn-primary { background: var(--primary-color); color: white; box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3); }
+.btn-secondary { background: var(--secondary-color); color: white; }
+
+/* TASKS CONTAINER */
+.tasks-container.list { display: flex; flex-direction: column; gap: 1rem; }
+.tasks-container.grid .drag-area {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem;
 }
 
 .task-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  border-left: 5px solid transparent;
+    position: relative;
+    padding: 1.2rem;
+    display: flex;
+    flex-direction: column; /* Force column for grid consistency, override in list via media query or specific class */
+    gap: 0.8rem;
+    height: 100%;
+    transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.task-item.priority-high { border-left-color: var(--danger-color); }
-.task-item.priority-medium { border-left-color: var(--warning-color); }
-.task-item.priority-low { border-left-color: var(--success-color); }
-
-.task-item.completed {
-  opacity: 0.6;
-  background: var(--bg-color);
-}
-.task-item.completed h3 {
-  text-decoration: line-through;
+.tasks-container.list .task-item {
+    flex-direction: row;
+    align-items: center;
 }
 
-/* Overdue style */
-.task-item.overdue {
-    border: 1px solid var(--danger-color);
-    background: rgba(239, 68, 68, 0.05);
+.task-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px var(--shadow-color);
 }
+
+.drag-handle {
+    cursor: grab;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+    display: flex;
+    align-items: center;
+}
+
+.task-content { flex: 1; overflow: hidden; }
 
 .task-header {
     display: flex;
-    align-items: center;
-    gap: 0.8rem;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 0.5rem;
-    flex-wrap: wrap;
 }
 
-.badges {
+.task-header h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.badges { display: flex; align-items: center; gap: 0.5rem; }
+.priority-dot { width: 10px; height: 10px; border-radius: 50%; }
+.priority-dot.low { background: var(--success-color); box-shadow: 0 0 8px var(--success-color); }
+.priority-dot.medium { background: var(--warning-color); box-shadow: 0 0 8px var(--warning-color); }
+.priority-dot.high { background: var(--danger-color); box-shadow: 0 0 8px var(--danger-color); }
+
+.category-pill {
+    display: inline-block;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.5rem;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.task-tags { display: flex; gap: 4px; margin-top: 5px; }
+.tag-dot { width: 8px; height: 8px; border-radius: 2px; }
+
+.task-actions {
     display: flex;
     gap: 0.5rem;
-    align-items: center;
+    margin-top: auto; /* Push to bottom in grid */
 }
 
-.priority-badge {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 12px;
-    font-weight: bold;
-    text-transform: uppercase;
+/* List specific overrides */
+.tasks-container.list .task-item {
+    padding: 1rem 1.5rem;
 }
-.priority-badge.high { background: rgba(255, 107, 107, 0.2); color: var(--danger-color); }
-.priority-badge.medium { background: rgba(255, 159, 67, 0.2); color: var(--warning-color); }
-.priority-badge.low { background: rgba(29, 209, 161, 0.2); color: var(--success-color); }
-
-.category-badge {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.6rem;
-    border-radius: 12px;
-    color: white;
-    font-weight: bold;
+.tasks-container.list .task-actions {
+    margin-top: 0;
 }
 
-.badge-danger-pill {
-    font-size: 0.75rem;
-    padding: 0.2rem 0.6rem;
-    border-radius: 12px;
-    background: var(--danger-color);
-    color: white;
-    font-weight: bold;
-}
+.fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
 
-.badge-danger {
-    background: var(--danger-color);
-    color: white;
-    padding: 0.2rem 0.5rem;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    margin-left: 0.5rem;
-}
-
-.meta-info {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-.due-date {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-}
-
-.text-danger {
-    color: var(--danger-color);
-    font-weight: bold;
-}
-
-.task-tags {
-    margin-top: 0.5rem;
-    display: flex;
-    gap: 0.3rem;
-    flex-wrap: wrap;
-}
-
-.tag-mini {
-    font-size: 0.75rem;
-    padding: 0.1rem 0.4rem;
-    border-radius: 4px;
-    border: 1px solid;
-}
-
-.tag-pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.3rem 0.6rem;
-  border-radius: 999px;
-  border: 1px solid;
-  font-size: 0.85rem;
-}
-
-/* Animation classes */
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.4s ease;
-}
-.list-enter-from,
-.list-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
-}
-.list-move {
-  transition: transform 0.4s ease;
+@media (max-width: 768px) {
+    .tasks-container.list .task-item { flex-direction: column; align-items: flex-start; }
+    .tasks-container.list .task-actions { width: 100%; justify-content: flex-end; margin-top: 1rem; }
+    .form-row { flex-direction: column; gap: 0; }
 }
 </style>

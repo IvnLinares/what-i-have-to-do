@@ -1,9 +1,14 @@
 <template>
   <div id="app">
+    <!-- Floating Theme Toggle -->
+    <button class="theme-toggle" @click="toggleTheme" :title="isDark ? 'Modo Claro' : 'Modo Oscuro'">
+        {{ isDark ? '🌞' : '🌙' }}
+    </button>
+
     <header>
       <h1>🚀 Copilot Testing Sandbox</h1>
       <p v-if="!authStore.user">Un espacio para explorar y practicar todas las funcionalidades de GitHub Copilot</p>
-      <div v-if="authStore.user" class="user-info">
+      <div v-if="authStore.user" class="user-info card glass-panel">
         <span>Hola, <strong>{{ authStore.user.username }}</strong></span>
         <button @click="handleLogout" class="btn btn-secondary btn-sm">Cerrar Sesión</button>
       </div>
@@ -23,9 +28,11 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/authStore'
+import { useTheme } from './composables/useTheme'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const { isDark, toggleTheme } = useTheme()
 
 const handleLogout = () => {
   authStore.logout()
@@ -34,6 +41,30 @@ const handleLogout = () => {
 </script>
 
 <style scoped>
+.theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
+    background: var(--surface-color);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background 0.3s;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1) rotate(15deg);
+}
+
 header {
   text-align: center;
   margin-bottom: 3rem;
@@ -50,6 +81,7 @@ header h1 {
   -webkit-text-fill-color: transparent;
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
+  text-shadow: 0 2px 10px rgba(99, 102, 241, 0.2);
 }
 
 .user-info {
@@ -57,11 +89,20 @@ header h1 {
   display: flex;
   align-items: center;
   gap: 1rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 50px; /* Pill shape */
+}
+
+.glass-panel {
+    background: var(--surface-color);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--surface-border);
 }
 
 .btn-sm {
   padding: 0.4rem 0.8rem;
   font-size: 0.9rem;
+  border-radius: 20px;
 }
 
 header p {
