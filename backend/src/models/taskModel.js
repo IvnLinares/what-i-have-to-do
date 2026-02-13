@@ -66,9 +66,9 @@ class TaskModel {
   }
 
   static async create(task) {
-    const { title, description, priority, category_id, user_id, tags } = task;
-    const sql = 'INSERT INTO tasks (title, description, priority, category_id, user_id) VALUES (?, ?, ?, ?, ?)';
-    const result = await db.run(sql, [title, description, priority || 'medium', category_id || null, user_id]);
+    const { title, description, priority, category_id, user_id, tags, due_date } = task;
+    const sql = 'INSERT INTO tasks (title, description, priority, category_id, user_id, due_date) VALUES (?, ?, ?, ?, ?, ?)';
+    const result = await db.run(sql, [title, description, priority || 'medium', category_id || null, user_id, due_date || null]);
     const taskId = result.lastID;
 
     if (tags && Array.isArray(tags)) {
@@ -81,7 +81,7 @@ class TaskModel {
   }
 
   static async update(id, task) {
-    const { title, description, completed, priority, category_id, tags } = task;
+    const { title, description, completed, priority, category_id, tags, due_date, reminder_sent } = task;
 
     let fields = [];
     let params = [];
@@ -91,6 +91,8 @@ class TaskModel {
     if (completed !== undefined) { fields.push('completed = ?'); params.push(completed); }
     if (priority !== undefined) { fields.push('priority = ?'); params.push(priority); }
     if (category_id !== undefined) { fields.push('category_id = ?'); params.push(category_id); }
+    if (due_date !== undefined) { fields.push('due_date = ?'); params.push(due_date); }
+    if (reminder_sent !== undefined) { fields.push('reminder_sent = ?'); params.push(reminder_sent); }
 
     fields.push('updated_at = CURRENT_TIMESTAMP');
 

@@ -1,10 +1,17 @@
 <template>
   <div class="task-manager">
 
-    <div class="settings-toggle">
-      <button @click="showSettings = !showSettings" class="btn btn-secondary">
-        {{ showSettings ? 'Ocultar Configuración' : '⚙️ Gestionar Categorías y Etiquetas' }}
-      </button>
+    <div class="top-controls">
+        <div class="view-toggle">
+            <button @click="viewMode = 'list'" class="btn" :class="{ active: viewMode === 'list' }">📋 Lista</button>
+            <button @click="viewMode = 'calendar'" class="btn" :class="{ active: viewMode === 'calendar' }">📅 Calendario</button>
+        </div>
+
+        <div class="settings-toggle">
+            <button @click="showSettings = !showSettings" class="btn btn-secondary">
+                {{ showSettings ? 'Ocultar Configuración' : '⚙️ Gestionar Categorías y Etiquetas' }}
+            </button>
+        </div>
     </div>
 
     <div v-if="showSettings" class="settings-panel">
@@ -12,6 +19,7 @@
       <TagManager />
     </div>
 
+    <!-- Task Form (always visible) -->
     <section class="task-form card">
       <h2>{{ editingTask ? 'Editar Tarea' : 'Nueva Tarea' }}</h2>
       <form @submit.prevent="handleSubmit">
@@ -56,6 +64,16 @@
         </div>
 
         <div class="form-group">
+            <label for="due_date">Fecha de Vencimiento:</label>
+            <input
+                v-model="form.due_date"
+                type="datetime-local"
+                id="due_date"
+                class="input-field"
+            />
+        </div>
+
+        <div class="form-group">
           <label>Etiquetas:</label>
           <div class="tags-input">
             <span
@@ -91,7 +109,15 @@
       </form>
     </section>
 
-    <section class="task-list">
+    <!-- CALENDAR VIEW -->
+    <TaskCalendar
+        v-if="viewMode === 'calendar'"
+        :tasks="store.filteredTasks"
+        @edit-task="startEdit"
+    />
+
+    <!-- LIST VIEW -->
+    <section v-if="viewMode === 'list'" class="task-list">
       <div class="list-header">
         <h2>📋 Lista de Tareas</h2>
 
@@ -106,6 +132,7 @@
 
         <div class="stats" v-if="store.tasks.length">
             <span class="badge">Pendientes: {{ store.pendingTasksCount }}</span>
+            <span class="badge badge-danger" v-if="store.overdueTasksCount > 0">Vencidas: {{ store.overdueTasksCount }}</span>
         </div>
       </div>
 
@@ -128,13 +155,18 @@
             v-for="task in store.sortedTasks"
             :key="task.id"
             class="task-item card"
-            :class="{ completed: task.completed, [`priority-${task.priority}`]: true }"
+            :class="{
+                completed: task.completed,
+                [`priority-${task.priority}`]: true,
+                overdue: isOverdue(task)
+            }"
             :style="task.category ? { borderRight: `5px solid ${task.category.color}` } : {}"
           >
             <div class="task-content">
               <div class="task-header">
                 <h3>{{ task.title }}</h3>
                 <div class="badges">
+                    <span v-if="isOverdue(task)" class="badge-danger-pill">⚠️ Vencida</span>
                     <span class="priority-badge" :class="task.priority">
                     {{ getPriorityLabel(task.priority) }}
                     </span>
@@ -144,6 +176,13 @@
                 </div>
               </div>
               <p v-if="task.description">{{ task.description }}</p>
+
+              <div class="meta-info">
+                  <small v-if="task.due_date" class="due-date" :class="{ 'text-danger': isOverdue(task) }">
+                      📅 Vence: {{ formatDateTime(task.due_date) }}
+                  </small>
+                  <small>📝 Creada: {{ formatDate(task.created_at) }}</small>
+              </div>
 
               <div class="task-tags" v-if="task.tags && task.tags.length">
                   <span
@@ -155,8 +194,6 @@
                     #{{ tag.name }}
                   </span>
               </div>
-
-              <small>Creada: {{ formatDate(task.created_at) }}</small>
             </div>
             <div class="task-actions">
               <button
@@ -195,19 +232,22 @@ import { useCategoryStore } from '../stores/categoryStore'
 import { useTagStore } from '../stores/tagStore'
 import CategoryManager from './CategoryManager.vue'
 import TagManager from './TagManager.vue'
+import TaskCalendar from './TaskCalendar.vue'
 
 const store = useTaskStore()
 const categoryStore = useCategoryStore()
 const tagStore = useTagStore()
 
 const showSettings = ref(false)
+const viewMode = ref('list') // 'list' or 'calendar'
 
 const form = ref({
   title: '',
   description: '',
   priority: 'medium',
   category_id: null,
-  tags: []
+  tags: [],
+  due_date: ''
 })
 
 const editingTask = ref(null)
@@ -230,14 +270,29 @@ const toggleTag = (tagId) => {
 const handleSubmit = async () => {
   if (!form.value.title.trim()) return
 
+  // Format date to ISO string if present
+  const payload = { ...form.value }
+  if (payload.due_date) {
+      payload.due_date = new Date(payload.due_date).toISOString()
+  } else {
+      payload.due_date = null
+  }
+
   if (editingTask.value) {
-    await store.updateTask(editingTask.value.id, { ...form.value })
+    await store.updateTask(editingTask.value.id, payload)
     cancelEdit()
   } else {
-    await store.addTask({ ...form.value })
+    await store.addTask(payload)
     // Reset form
-    form.value = { title: '', description: '', priority: 'medium', category_id: null, tags: [] }
+    form.value = { title: '', description: '', priority: 'medium', category_id: null, tags: [], due_date: '' }
   }
+}
+
+const formatDateForInput = (dateString) => {
+  if (!dateString) return ''
+  const date = new Date(dateString)
+  const pad = (n) => n < 10 ? '0' + n : n
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
 }
 
 const startEdit = (task) => {
@@ -247,14 +302,15 @@ const startEdit = (task) => {
     description: task.description || '',
     priority: task.priority || 'medium',
     category_id: task.category ? task.category.id : null,
-    tags: task.tags ? task.tags.map(t => t.id) : []
+    tags: task.tags ? task.tags.map(t => t.id) : [],
+    due_date: formatDateForInput(task.due_date)
   }
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const cancelEdit = () => {
   editingTask.value = null
-  form.value = { title: '', description: '', priority: 'medium', category_id: null, tags: [] }
+  form.value = { title: '', description: '', priority: 'medium', category_id: null, tags: [], due_date: '' }
 }
 
 const confirmDelete = async (id) => {
@@ -267,6 +323,14 @@ const formatDate = (dateString) => {
   const date = new Date(dateString)
   return date.toLocaleDateString('es-ES', {
     year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  })
+}
+
+const formatDateTime = (dateString) => {
+  const date = new Date(dateString)
+  return date.toLocaleString('es-ES', {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',
@@ -282,17 +346,43 @@ const getPriorityLabel = (priority) => {
   }
   return labels[priority] || priority
 }
+
+const isOverdue = (task) => {
+    if (task.completed || !task.due_date) return false
+    return new Date(task.due_date) < new Date()
+}
 </script>
 
 <style scoped>
+/* Same styles as before plus... */
 .task-manager {
   max-width: 800px;
   margin: 0 auto;
 }
 
-.settings-toggle {
-    text-align: right;
+.top-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     margin-bottom: 1rem;
+}
+
+.view-toggle {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.view-toggle .btn {
+    padding: 0.5rem 1rem;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+.view-toggle .btn.active {
+    background-color: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
 }
 
 .settings-panel {
@@ -433,6 +523,12 @@ const getPriorityLabel = (priority) => {
   text-decoration: line-through;
 }
 
+/* Overdue style */
+.task-item.overdue {
+    border: 1px solid var(--danger-color);
+    background: rgba(239, 68, 68, 0.05);
+}
+
 .task-header {
     display: flex;
     align-items: center;
@@ -463,6 +559,43 @@ const getPriorityLabel = (priority) => {
     padding: 0.2rem 0.6rem;
     border-radius: 12px;
     color: white;
+    font-weight: bold;
+}
+
+.badge-danger-pill {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+    background: var(--danger-color);
+    color: white;
+    font-weight: bold;
+}
+
+.badge-danger {
+    background: var(--danger-color);
+    color: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    margin-left: 0.5rem;
+}
+
+.meta-info {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.due-date {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+.text-danger {
+    color: var(--danger-color);
     font-weight: bold;
 }
 

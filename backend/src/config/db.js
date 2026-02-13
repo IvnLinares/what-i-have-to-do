@@ -67,6 +67,8 @@ function initializeDatabase() {
       priority TEXT DEFAULT 'medium',
       user_id INTEGER,
       category_id INTEGER,
+      due_date DATETIME,
+      reminder_sent BOOLEAN DEFAULT 0,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(user_id) REFERENCES users(id),
@@ -101,6 +103,18 @@ function initializeDatabase() {
         if (!hasCategoryId) {
            console.log("Adding category_id column to tasks table...");
            db.run("ALTER TABLE tasks ADD COLUMN category_id INTEGER REFERENCES categories(id)");
+        }
+
+        const hasDueDate = rows.some(row => row.name === 'due_date');
+        if (!hasDueDate) {
+           console.log("Adding due_date column to tasks table...");
+           db.run("ALTER TABLE tasks ADD COLUMN due_date DATETIME");
+        }
+
+        const hasReminderSent = rows.some(row => row.name === 'reminder_sent');
+        if (!hasReminderSent) {
+           console.log("Adding reminder_sent column to tasks table...");
+           db.run("ALTER TABLE tasks ADD COLUMN reminder_sent BOOLEAN DEFAULT 0");
         }
       });
     }

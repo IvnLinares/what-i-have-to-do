@@ -53,18 +53,32 @@ export const useTaskStore = defineStore('task', {
             return a.completed ? 1 : -1
         }
 
-        // 2. Sort by priority (descending weight)
+        // 2. Sort by due date (soonest first)
+        // Only if both have due dates.
+        // If one has due date and other doesn't?
+        // Let's prioritize due date if exists and overdue or soon.
+        if (a.due_date && b.due_date) {
+            return new Date(a.due_date) - new Date(b.due_date)
+        }
+        if (a.due_date && !b.due_date) return -1 // a comes first
+        if (!a.due_date && b.due_date) return 1 // b comes first
+
+        // 3. Sort by priority (descending weight)
         const pA = priorityWeight[a.priority] || 2
         const pB = priorityWeight[b.priority] || 2
         if (pA !== pB) {
             return pB - pA
         }
 
-        // 3. Sort by date (newest first)
+        // 4. Sort by date (newest first)
         return new Date(b.created_at) - new Date(a.created_at)
       })
     },
     pendingTasksCount: (state) => state.tasks.filter(t => !t.completed).length,
+    overdueTasksCount(state) {
+        const now = new Date()
+        return state.tasks.filter(t => !t.completed && t.due_date && new Date(t.due_date) < now).length
+    },
 
     // Stats: Tasks by Category
     tasksByCategory(state) {

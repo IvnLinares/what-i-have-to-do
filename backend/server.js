@@ -11,6 +11,7 @@ const authRoutes = require('./src/routes/authRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const tagRoutes = require('./src/routes/tagRoutes');
 const errorHandler = require('./src/middleware/errorHandler');
+const reminderService = require('./src/services/reminderService');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // Serve static files from the React/Vue frontend app
 app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// Start Reminder Service
+reminderService.start();
 
 // API Routes
 app.get('/api', (req, res) => {
