@@ -8,6 +8,8 @@ require('dotenv').config();
 const db = require('./src/config/db');
 const taskRoutes = require('./src/routes/taskRoutes');
 const authRoutes = require('./src/routes/authRoutes');
+const categoryRoutes = require('./src/routes/categoryRoutes');
+const tagRoutes = require('./src/routes/tagRoutes');
 const errorHandler = require('./src/middleware/errorHandler');
 
 const app = express();
@@ -31,6 +33,8 @@ app.get('/api', (req, res) => {
 
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/categories', categoryRoutes);
+app.use('/api/tags', tagRoutes);
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.

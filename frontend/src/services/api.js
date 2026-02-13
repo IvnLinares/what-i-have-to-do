@@ -49,5 +49,39 @@ export default {
   
   deleteTask(id) {
     return apiClient.delete(`/api/tasks/${id}`)
+  },
+
+  // Categories API
+  getCategories() {
+    return apiClient.get('/api/categories')
+  },
+
+  createCategory(category) {
+    return apiClient.post('/api/categories', category)
+  },
+
+  updateCategory(id, category) {
+    return apiClient.put(`/api/categories/${id}`, category)
+  },
+
+  deleteCategory(id) {
+    return apiClient.delete(`/api/categories/${id}`)
+  },
+
+  // Tags API
+  getTags() {
+    return apiClient.get('/api/tags')
+  },
+
+  createTag(tag) {
+    return apiClient.post('/api/tags', tag)
+  },
+
+  updateTag(id, tag) {
+    return apiClient.put(`/api/tags/${id}`, tag)
+  },
+
+  deleteTag(id) {
+    return apiClient.delete(`/api/tags/${id}`)
   }
 }

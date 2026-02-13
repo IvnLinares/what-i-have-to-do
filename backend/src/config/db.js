@@ -13,6 +13,7 @@ const db = new sqlite3.Database(dbPath, (err) => {
 });
 
 function initializeDatabase() {
+  // Users Table
   db.run(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,13 +23,41 @@ function initializeDatabase() {
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
   `, (err) => {
-    if (err) {
-      console.error('Error creating users table:', err.message);
-    } else {
-      console.log('Users table ready');
-    }
+    if (err) console.error('Error creating users table:', err.message);
+    else console.log('Users table ready');
   });
 
+  // Categories Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      color TEXT DEFAULT '#6366f1',
+      user_id INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+  `, (err) => {
+      if (err) console.error('Error creating categories table:', err.message);
+      else console.log('Categories table ready');
+  });
+
+  // Tags Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS tags (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      color TEXT DEFAULT '#10b981',
+      user_id INTEGER,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+  `, (err) => {
+      if (err) console.error('Error creating tags table:', err.message);
+      else console.log('Tags table ready');
+  });
+
+  // Tasks Table
   db.run(`
     CREATE TABLE IF NOT EXISTS tasks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,9 +66,11 @@ function initializeDatabase() {
       completed BOOLEAN DEFAULT 0,
       priority TEXT DEFAULT 'medium',
       user_id INTEGER,
+      category_id INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY(user_id) REFERENCES users(id)
+      FOREIGN KEY(user_id) REFERENCES users(id),
+      FOREIGN KEY(category_id) REFERENCES categories(id)
     )
   `, (err) => {
     if (err) {
@@ -47,31 +78,46 @@ function initializeDatabase() {
     } else {
       console.log('Tasks table ready');
 
-      // Check if priority column exists (migration for existing DB)
+      // Check existing columns (migration)
       db.all("PRAGMA table_info(tasks)", [], (err, rows) => {
         if (err) {
           console.error("Error checking table info:", err);
           return;
         }
+
         const hasPriority = rows.some(row => row.name === 'priority');
         if (!hasPriority) {
           console.log("Adding priority column to tasks table...");
-          db.run("ALTER TABLE tasks ADD COLUMN priority TEXT DEFAULT 'medium'", (err) => {
-             if (err) console.error("Error adding priority column:", err);
-             else console.log("Priority column added.");
-          });
+          db.run("ALTER TABLE tasks ADD COLUMN priority TEXT DEFAULT 'medium'");
         }
 
         const hasUserId = rows.some(row => row.name === 'user_id');
         if (!hasUserId) {
            console.log("Adding user_id column to tasks table...");
-           db.run("ALTER TABLE tasks ADD COLUMN user_id INTEGER REFERENCES users(id)", (err) => {
-             if (err) console.error("Error adding user_id column:", err);
-             else console.log("User ID column added.");
-           });
+           db.run("ALTER TABLE tasks ADD COLUMN user_id INTEGER REFERENCES users(id)");
+        }
+
+        const hasCategoryId = rows.some(row => row.name === 'category_id');
+        if (!hasCategoryId) {
+           console.log("Adding category_id column to tasks table...");
+           db.run("ALTER TABLE tasks ADD COLUMN category_id INTEGER REFERENCES categories(id)");
         }
       });
     }
+  });
+
+  // Task Tags Join Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS task_tags (
+      task_id INTEGER,
+      tag_id INTEGER,
+      PRIMARY KEY (task_id, tag_id),
+      FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+      FOREIGN KEY(tag_id) REFERENCES tags(id) ON DELETE CASCADE
+    )
+  `, (err) => {
+      if (err) console.error('Error creating task_tags table:', err.message);
+      else console.log('Task_Tags table ready');
   });
 }
 

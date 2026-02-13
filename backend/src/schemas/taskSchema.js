@@ -5,6 +5,8 @@ const taskSchema = z.object({
   description: z.string().optional(),
   priority: z.enum(['low', 'medium', 'high']).optional().default('medium'),
   completed: z.boolean().optional(),
+  category_id: z.number().optional().nullable(),
+  tags: z.array(z.number()).optional()
 });
 
 const updateTaskSchema = taskSchema.partial();
