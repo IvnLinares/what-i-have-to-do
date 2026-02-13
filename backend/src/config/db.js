@@ -14,14 +14,32 @@ const db = new sqlite3.Database(dbPath, (err) => {
 
 function initializeDatabase() {
   db.run(`
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      username TEXT UNIQUE NOT NULL,
+      password TEXT NOT NULL,
+      role TEXT DEFAULT 'user',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+    if (err) {
+      console.error('Error creating users table:', err.message);
+    } else {
+      console.log('Users table ready');
+    }
+  });
+
+  db.run(`
     CREATE TABLE IF NOT EXISTS tasks (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT NOT NULL,
       description TEXT,
       completed BOOLEAN DEFAULT 0,
       priority TEXT DEFAULT 'medium',
+      user_id INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id)
     )
   `, (err) => {
     if (err) {
@@ -42,6 +60,15 @@ function initializeDatabase() {
              if (err) console.error("Error adding priority column:", err);
              else console.log("Priority column added.");
           });
+        }
+
+        const hasUserId = rows.some(row => row.name === 'user_id');
+        if (!hasUserId) {
+           console.log("Adding user_id column to tasks table...");
+           db.run("ALTER TABLE tasks ADD COLUMN user_id INTEGER REFERENCES users(id)", (err) => {
+             if (err) console.error("Error adding user_id column:", err);
+             else console.log("User ID column added.");
+           });
         }
       });
     }

@@ -1,12 +1,16 @@
 <template>
-  <div>
+  <div id="app">
     <header>
       <h1>🚀 Copilot Testing Sandbox</h1>
-      <p>Un espacio para explorar y practicar todas las funcionalidades de GitHub Copilot</p>
+      <p v-if="!authStore.user">Un espacio para explorar y practicar todas las funcionalidades de GitHub Copilot</p>
+      <div v-if="authStore.user" class="user-info">
+        <span>Hola, <strong>{{ authStore.user.username }}</strong></span>
+        <button @click="handleLogout" class="btn btn-secondary btn-sm">Cerrar Sesión</button>
+      </div>
     </header>
 
     <main>
-      <TaskManager />
+      <router-view></router-view>
     </main>
 
     <footer>
@@ -16,7 +20,17 @@
 </template>
 
 <script setup>
-import TaskManager from './components/TaskManager.vue'
+import { computed } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from './stores/authStore'
+
+const authStore = useAuthStore()
+const router = useRouter()
+
+const handleLogout = () => {
+  authStore.logout()
+  router.push('/login')
+}
 </script>
 
 <style scoped>
@@ -25,6 +39,9 @@ header {
   margin-bottom: 3rem;
   padding: 2rem 0;
   border-bottom: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 header h1 {
@@ -33,6 +50,18 @@ header h1 {
   -webkit-text-fill-color: transparent;
   font-size: 2.5rem;
   margin-bottom: 0.5rem;
+}
+
+.user-info {
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.9rem;
 }
 
 header p {

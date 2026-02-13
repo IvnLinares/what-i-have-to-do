@@ -1,11 +1,13 @@
 const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const path = require('path');
 require('dotenv').config();
 
 // Import local modules
 const db = require('./src/config/db');
 const taskRoutes = require('./src/routes/taskRoutes');
+const authRoutes = require('./src/routes/authRoutes');
 const errorHandler = require('./src/middleware/errorHandler');
 
 const app = express();
@@ -16,32 +18,32 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// Root route
-app.get('/', (req, res) => {
+// Serve static files from the React/Vue frontend app
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+
+// API Routes
+app.get('/api', (req, res) => {
   res.json({
     message: 'Welcome to Copilot Testing API',
-    version: '2.0.0',
-    endpoints: {
-      tasks: {
-        getAll: 'GET /api/tasks',
-        getOne: 'GET /api/tasks/:id',
-        create: 'POST /api/tasks',
-        update: 'PUT /api/tasks/:id',
-        delete: 'DELETE /api/tasks/:id'
-      }
-    }
+    version: '2.0.0'
   });
 });
 
-// API Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+
+// The "catchall" handler: for any request that doesn't
+// match one above, send back React's index.html file.
+app.get(/.*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+});
 
 // Error Handling
 app.use(errorHandler);
 
 // Start server
-const server = app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+const server = app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
 
 // Graceful shutdown
