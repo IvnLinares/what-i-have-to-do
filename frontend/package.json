@@ -15,6 +15,7 @@
   "dependencies": {
     "axios": "^1.12.2",
     "pinia": "^3.0.4",
+    "vite-plugin-pwa": "^1.2.0",
     "vue": "^3.5.22",
     "vue-router": "^5.0.2",
     "vuedraggable": "^4.1.0"

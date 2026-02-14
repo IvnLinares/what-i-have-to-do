@@ -27,6 +27,22 @@ function initializeDatabase() {
     else console.log('Users table ready');
   });
 
+  // Push Subscriptions Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS push_subscriptions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER,
+      endpoint TEXT NOT NULL UNIQUE,
+      keys_auth TEXT NOT NULL,
+      keys_p256dh TEXT NOT NULL,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+  `, (err) => {
+      if (err) console.error('Error creating push_subscriptions table:', err.message);
+      else console.log('Push Subscriptions table ready');
+  });
+
   // Categories Table
   db.run(`
     CREATE TABLE IF NOT EXISTS categories (

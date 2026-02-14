@@ -1,5 +1,7 @@
 <template>
   <div id="app">
+    <ReloadPrompt />
+
     <!-- Floating Theme Toggle -->
     <button class="theme-toggle" @click="toggleTheme" :title="isDark ? 'Modo Claro' : 'Modo Oscuro'">
         {{ isDark ? '🌞' : '🌙' }}
@@ -29,6 +31,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from './stores/authStore'
 import { useTheme } from './composables/useTheme'
+import ReloadPrompt from './components/ReloadPrompt.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
