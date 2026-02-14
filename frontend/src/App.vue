@@ -4,7 +4,7 @@
 
     <!-- Floating Theme Toggle (Glass Circle) -->
     <button class="theme-toggle hover-lift" @click="toggleTheme" :title="isDark ? 'Modo Claro' : 'Modo Oscuro'">
-        {{ isDark ? '🌞' : '🌙' }}
+        <font-awesome-icon :icon="isDark ? 'sun' : 'moon'" />
     </button>
 
     <header>
@@ -13,9 +13,13 @@
       <!-- User Info Pill -->
       <transition name="fade">
         <div v-if="authStore.user" class="user-info hover-lift">
-            <span class="user-avatar">{{ authStore.user.username.charAt(0).toUpperCase() }}</span>
+            <span class="user-avatar">
+                <font-awesome-icon icon="user" />
+            </span>
             <span class="user-welcome">Hola, <strong>{{ authStore.user.username }}</strong></span>
-            <button @click="handleLogout" class="btn-logout">Salir</button>
+            <button @click="handleLogout" class="btn-logout" title="Cerrar Sesión">
+                <font-awesome-icon icon="right-from-bracket" />
+            </button>
         </div>
         <p v-else class="subtitle">Explora y gestiona tus tareas con estilo.</p>
       </transition>
@@ -91,12 +95,13 @@ header h1 {
     background: var(--glass-surface);
     backdrop-filter: blur(var(--glass-blur));
     box-shadow: var(--glass-shadow);
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    color: var(--text-color);
 }
 
 /* --- User Info Pill (Glass) --- */
@@ -123,8 +128,7 @@ header h1 {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .user-welcome {
@@ -138,9 +142,11 @@ header h1 {
   border: 1px solid transparent;
   padding: 0.4rem 0.8rem;
   border-radius: 20px;
-  font-size: 0.85rem;
+  font-size: 1rem;
   cursor: pointer;
   transition: all 0.2s;
+  display: flex;
+  align-items: center;
 }
 
 .btn-logout:hover {

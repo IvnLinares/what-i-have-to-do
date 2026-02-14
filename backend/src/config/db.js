@@ -85,10 +85,12 @@ function initializeDatabase() {
       category_id INTEGER,
       due_date DATETIME,
       reminder_sent BOOLEAN DEFAULT 0,
+      parent_id INTEGER,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(user_id) REFERENCES users(id),
-      FOREIGN KEY(category_id) REFERENCES categories(id)
+      FOREIGN KEY(category_id) REFERENCES categories(id),
+      FOREIGN KEY(parent_id) REFERENCES tasks(id) ON DELETE CASCADE
     )
   `, (err) => {
     if (err) {
@@ -132,6 +134,12 @@ function initializeDatabase() {
            console.log("Adding reminder_sent column to tasks table...");
            db.run("ALTER TABLE tasks ADD COLUMN reminder_sent BOOLEAN DEFAULT 0");
         }
+
+        const hasParentId = rows.some(row => row.name === 'parent_id');
+        if (!hasParentId) {
+           console.log("Adding parent_id column to tasks table...");
+           db.run("ALTER TABLE tasks ADD COLUMN parent_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE");
+        }
       });
     }
   });
@@ -148,6 +156,20 @@ function initializeDatabase() {
   `, (err) => {
       if (err) console.error('Error creating task_tags table:', err.message);
       else console.log('Task_Tags table ready');
+  });
+
+  // Task Dependencies Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS task_dependencies (
+      task_id INTEGER,
+      dependency_id INTEGER,
+      PRIMARY KEY (task_id, dependency_id),
+      FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE,
+      FOREIGN KEY(dependency_id) REFERENCES tasks(id) ON DELETE CASCADE
+    )
+  `, (err) => {
+      if (err) console.error('Error creating task_dependencies table:', err.message);
+      else console.log('Task_Dependencies table ready');
   });
 }
 

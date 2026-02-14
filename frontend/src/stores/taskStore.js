@@ -50,13 +50,17 @@ export const useTaskStore = defineStore('task', {
     // Sorted version of filtered tasks
     sortedTasks(state) {
       const priorityWeight = { high: 3, medium: 2, low: 1 }
+      // Use filtered tasks
+      // IMPORTANT: For hierarchy display, we might want to filter only top-level tasks
+      // but 'filteredTasks' currently returns everything matching filters.
+      // If we want a strict tree view, we should change logic.
+      // For now, let's keep it flat-ish but handle subtasks in UI if parent is present.
+      // Or maybe filter out children if their parent is also in the list?
+      // Let's stick to flat list for the main grid, but maybe indicate hierarchy.
+
       const tasks = this.filteredTasks || []
 
       return [...tasks].sort((a, b) => {
-        // Always sort completed to bottom regardless of sort option, unless specifically sorting by status (not implemented)
-        // But users might want to see completed tasks sorted by date too.
-        // Let's keep the "completed at bottom" logic for 'smart' sort, maybe relax for others?
-        // For now, let's keep it consistent: Completed always last.
         if (a.completed !== b.completed) {
             return a.completed ? 1 : -1
         }
@@ -74,19 +78,16 @@ export const useTaskStore = defineStore('task', {
                 return a.title.localeCompare(b.title)
             case 'smart':
             default:
-                // 1. Due Date (soonest first)
                 if (a.due_date && b.due_date) {
                     return new Date(a.due_date) - new Date(b.due_date)
                 }
                 if (a.due_date && !b.due_date) return -1
                 if (!a.due_date && b.due_date) return 1
 
-                // 2. Priority
                 const pA = priorityWeight[a.priority] || 2
                 const pB = priorityWeight[b.priority] || 2
                 if (pA !== pB) return pB - pA
 
-                // 3. Created Date (newest first)
                 return new Date(b.created_at) - new Date(a.created_at)
         }
       })
@@ -105,23 +106,54 @@ export const useTaskStore = defineStore('task', {
       })
       return stats
     },
-    // Autocomplete suggestions
     searchSuggestions(state) {
         if (!state.searchQuery || state.searchQuery.length < 2) return []
         const query = state.searchQuery.toLowerCase()
         return state.tasks
             .filter(t => t.title.toLowerCase().includes(query))
             .map(t => t.title)
-            .slice(0, 5) // Limit to 5 suggestions
+            .slice(0, 5)
+    },
+    // Hierarchy Helper
+    taskTree(state) {
+        // Build a tree for UI consumption if needed
+        const taskMap = {}
+        const roots = []
+
+        // 1. Initialize map
+        state.tasks.forEach(t => {
+            taskMap[t.id] = { ...t, children: [], progress: 0 }
+        })
+
+        // 2. Build Hierarchy
+        state.tasks.forEach(t => {
+            if (t.parent_id && taskMap[t.parent_id]) {
+                taskMap[t.parent_id].children.push(taskMap[t.id])
+            } else {
+                roots.push(taskMap[t.id])
+            }
+        })
+
+        // 3. Calculate Composite Progress
+        // Simple recursive progress: (completed children / total children)
+        const calcProgress = (node) => {
+            if (node.children.length === 0) {
+                return node.completed ? 100 : 0
+            }
+            let sum = 0
+            node.children.forEach(c => sum += calcProgress(c))
+            node.progress = Math.round(sum / node.children.length)
+            return node.progress
+        }
+
+        roots.forEach(r => calcProgress(r))
+        return roots
     }
   },
   actions: {
-    setSearchQuery(query) {
-        this.searchQuery = query
-    },
-    setSortOption(option) {
-        this.sortOption = option
-    },
+    setSearchQuery(query) { this.searchQuery = query },
+    setSortOption(option) { this.sortOption = option },
+
     async fetchTasks() {
       this.loading = true
       this.error = null
@@ -130,7 +162,6 @@ export const useTaskStore = defineStore('task', {
         this.tasks = response.data.tasks
       } catch (err) {
         this.error = 'Error loading tasks: ' + (err.response?.data?.error || err.message)
-        console.error(err)
       } finally {
         this.loading = false
       }

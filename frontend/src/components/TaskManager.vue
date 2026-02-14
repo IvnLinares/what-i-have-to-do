@@ -5,18 +5,18 @@
     <div class="top-controls glass-panel">
         <div class="view-toggle">
             <button @click="viewMode = 'list'" class="btn-toggle" :class="{ active: viewMode === 'list' }" title="Lista">
-                📋
+                <font-awesome-icon icon="list" />
             </button>
             <button @click="viewMode = 'grid'" class="btn-toggle" :class="{ active: viewMode === 'grid' }" title="Cuadrícula">
-                🍱
+                <font-awesome-icon icon="grip" />
             </button>
             <button @click="viewMode = 'calendar'" class="btn-toggle" :class="{ active: viewMode === 'calendar' }" title="Calendario">
-                📅
+                <font-awesome-icon icon="calendar-days" />
             </button>
         </div>
 
         <button @click="showSettings = !showSettings" class="btn-settings hover-lift">
-            {{ showSettings ? 'Cerrar' : '⚙️ Configuración' }}
+            <font-awesome-icon icon="gear" /> {{ showSettings ? 'Cerrar' : 'Configuración' }}
         </button>
     </div>
 
@@ -31,7 +31,7 @@
     <!-- Task Form (Glass Card) -->
     <section class="task-form card hover-lift">
       <div class="form-header">
-          <h2>{{ editingTask ? '✏️ Editar Tarea' : '✨ Nueva Tarea' }}</h2>
+          <h2>{{ editingTask ? 'Editar Tarea' : 'Nueva Tarea' }}</h2>
       </div>
 
       <form @submit.prevent="handleSubmit">
@@ -58,9 +58,9 @@
           <div class="form-group half">
             <div class="select-wrapper">
                 <select v-model="form.priority" class="input-modern">
-                <option value="low">🟢 Baja</option>
-                <option value="medium">🟠 Media</option>
-                <option value="high">🔴 Alta</option>
+                <option value="low">Baja</option>
+                <option value="medium">Media</option>
+                <option value="high">Alta</option>
                 </select>
             </div>
           </div>
@@ -68,13 +68,44 @@
           <div class="form-group half">
             <div class="select-wrapper">
                 <select v-model="form.category_id" class="input-modern">
-                <option :value="null">📂 Sin Categoría</option>
+                <option :value="null">Sin Categoría</option>
                 <option v-for="cat in categoryStore.categories" :key="cat.id" :value="cat.id">
                     {{ cat.name }}
                 </option>
                 </select>
             </div>
           </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group half">
+                <label class="label-sub">Subtarea de:</label>
+                <div class="select-wrapper">
+                    <select v-model="form.parent_id" class="input-modern">
+                        <option :value="null">-- Ninguna (Raíz) --</option>
+                        <option
+                            v-for="task in potentialParents"
+                            :key="task.id"
+                            :value="task.id"
+                        >
+                            {{ task.title }}
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group half">
+                <label class="label-sub">Bloqueada por:</label>
+                <select multiple v-model="form.dependencies" class="input-modern multiselect">
+                    <option
+                        v-for="task in potentialParents"
+                        :key="task.id"
+                        :value="task.id"
+                    >
+                        {{ task.title }}
+                    </option>
+                </select>
+            </div>
         </div>
 
         <div class="form-group">
@@ -103,7 +134,8 @@
 
         <div class="form-actions">
           <button type="submit" class="btn btn-primary" :disabled="store.loading">
-            {{ editingTask ? 'Guardar Cambios' : 'Crear Tarea' }}
+            <font-awesome-icon :icon="editingTask ? 'save' : 'plus'" />
+            {{ editingTask ? 'Guardar' : 'Crear' }}
           </button>
           <button
             v-if="editingTask"
@@ -111,7 +143,7 @@
             @click="cancelEdit"
             class="btn btn-text"
           >
-            Cancelar
+            <font-awesome-icon icon="xmark" /> Cancelar
           </button>
         </div>
       </form>
@@ -133,7 +165,9 @@
             <h3>Mis Tareas</h3>
             <div class="stats-pills">
                 <span class="stat-pill">Pendientes: {{ store.pendingTasksCount }}</span>
-                <span v-if="store.overdueTasksCount > 0" class="stat-pill danger">Vencidas: {{ store.overdueTasksCount }}</span>
+                <span v-if="store.overdueTasksCount > 0" class="stat-pill danger">
+                    <font-awesome-icon icon="triangle-exclamation" /> {{ store.overdueTasksCount }}
+                </span>
             </div>
         </div>
 
@@ -156,16 +190,25 @@
                         :class="{
                             completed: task.completed,
                             [`priority-${task.priority}`]: true,
-                            overdue: isOverdue(task)
+                            overdue: isOverdue(task),
+                            blocked: isBlocked(task)
                         }"
                         :style="task.category ? { '--cat-color': task.category.color } : {}"
                     >
                         <div class="card-accent"></div>
 
+                        <!-- Progress Bar for Parents -->
+                        <div v-if="hasSubtasks(task)" class="progress-container">
+                            <div class="progress-bar" :style="{ width: getProgress(task) + '%' }"></div>
+                        </div>
+
                         <div class="task-body">
                             <div class="task-top">
-                                <div class="drag-handle">⋮⋮</div>
-                                <h4 class="task-title">{{ task.title }}</h4>
+                                <div class="drag-handle"><font-awesome-icon icon="grip" /></div>
+                                <h4 class="task-title">
+                                    <span v-if="isBlocked(task)" class="blocked-icon" title="Bloqueada por dependencias">🔒</span>
+                                    {{ task.title }}
+                                </h4>
                                 <span class="priority-dot" :class="task.priority"></span>
                             </div>
 
@@ -173,10 +216,21 @@
 
                             <div class="task-meta">
                                 <span v-if="task.category" class="meta-badge category">
-                                    {{ task.category.name }}
+                                    <font-awesome-icon icon="folder" /> {{ task.category.name }}
                                 </span>
                                 <span v-if="task.due_date" class="meta-badge date" :class="{ danger: isOverdue(task) }">
-                                    {{ formatDateTime(task.due_date) }}
+                                    <font-awesome-icon icon="calendar-days" /> {{ formatDateTime(task.due_date) }}
+                                </span>
+                                <span v-if="task.parent_id" class="meta-badge subtask">
+                                    ↳ Subtarea
+                                </span>
+                            </div>
+
+                            <!-- Dependencies List -->
+                            <div v-if="task.dependencies && task.dependencies.length > 0" class="deps-list">
+                                <span class="dep-label">Depende de:</span>
+                                <span v-for="depId in task.dependencies" :key="depId" class="dep-tag" :class="{ done: isTaskDone(depId) }">
+                                    {{ getTaskTitle(depId) }}
                                 </span>
                             </div>
 
@@ -186,11 +240,20 @@
                         </div>
 
                         <div class="task-actions-overlay">
-                            <button @click.stop="store.updateTask(task.id, { completed: !task.completed })" class="action-btn check" title="Completar">
-                                {{ task.completed ? '↩️' : '✓' }}
+                            <button
+                                @click.stop="store.updateTask(task.id, { completed: !task.completed })"
+                                class="action-btn check"
+                                :disabled="isBlocked(task) && !task.completed"
+                                :title="isBlocked(task) ? 'Bloqueada' : (task.completed ? 'Deshacer' : 'Completar')"
+                            >
+                                <font-awesome-icon :icon="task.completed ? 'undo' : 'check'" />
                             </button>
-                            <button @click.stop="startEdit(task)" class="action-btn edit" title="Editar">✏️</button>
-                            <button @click.stop="confirmDelete(task.id)" class="action-btn delete" title="Eliminar">🗑️</button>
+                            <button @click.stop="startEdit(task)" class="action-btn edit" title="Editar">
+                                <font-awesome-icon icon="edit" />
+                            </button>
+                            <button @click.stop="confirmDelete(task.id)" class="action-btn delete" title="Eliminar">
+                                <font-awesome-icon icon="trash" />
+                            </button>
                         </div>
                     </div>
                 </template>
@@ -218,12 +281,20 @@ const tagStore = useTagStore()
 
 const showSettings = ref(false)
 const viewMode = ref('list')
-const form = ref({ title: '', description: '', priority: 'medium', category_id: null, tags: [], due_date: '' })
+const form = ref({
+    title: '', description: '', priority: 'medium', category_id: null,
+    tags: [], due_date: '', parent_id: null, dependencies: []
+})
 const editingTask = ref(null)
 
 const localTasks = computed({
     get: () => store.sortedTasks,
     set: (val) => {}
+})
+
+// Potential parents: tasks that are NOT the current editing task (to avoid loops)
+const potentialParents = computed(() => {
+    return store.tasks.filter(t => !editingTask.value || t.id !== editingTask.value.id)
 })
 
 const onDragEnd = () => {}
@@ -242,15 +313,24 @@ const toggleTag = (tagId) => {
 
 const handleSubmit = async () => {
   if (!form.value.title.trim()) return
-  const payload = { ...form.value, due_date: form.value.due_date ? new Date(form.value.due_date).toISOString() : null }
+  const payload = {
+      ...form.value,
+      due_date: form.value.due_date ? new Date(form.value.due_date).toISOString() : null,
+      parent_id: form.value.parent_id || null,
+      // dependencies already array
+  }
 
   if (editingTask.value) {
     await store.updateTask(editingTask.value.id, payload)
     cancelEdit()
   } else {
     await store.addTask(payload)
-    form.value = { title: '', description: '', priority: 'medium', category_id: null, tags: [], due_date: '' }
+    resetForm()
   }
+}
+
+const resetForm = () => {
+    form.value = { title: '', description: '', priority: 'medium', category_id: null, tags: [], due_date: '', parent_id: null, dependencies: [] }
 }
 
 const formatDateForInput = (dateString) => {
@@ -268,14 +348,16 @@ const startEdit = (task) => {
     priority: task.priority || 'medium',
     category_id: task.category ? task.category.id : null,
     tags: task.tags ? task.tags.map(t => t.id) : [],
-    due_date: formatDateForInput(task.due_date)
+    due_date: formatDateForInput(task.due_date),
+    parent_id: task.parent_id || null,
+    dependencies: task.dependencies || [] // Assumes backend sends array of IDs
   }
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
 
 const cancelEdit = () => {
   editingTask.value = null
-  form.value = { title: '', description: '', priority: 'medium', category_id: null, tags: [], due_date: '' }
+  resetForm()
 }
 
 const confirmDelete = async (id) => {
@@ -288,12 +370,51 @@ const formatDateTime = (dateString) => {
 }
 
 const isOverdue = (task) => !task.completed && task.due_date && new Date(task.due_date) < new Date()
+
+// Subtask Logic
+const hasSubtasks = (task) => {
+    return store.tasks.some(t => t.parent_id === task.id)
+}
+
+const getProgress = (task) => {
+    const subtasks = store.tasks.filter(t => t.parent_id === task.id)
+    if (subtasks.length === 0) return 0
+    const completed = subtasks.filter(t => t.completed).length
+    return Math.round((completed / subtasks.length) * 100)
+}
+
+// Dependency Logic
+const isBlocked = (task) => {
+    if (!task.dependencies || task.dependencies.length === 0) return false
+    // Check if any dependency is NOT completed
+    // Dependencies are IDs
+    return task.dependencies.some(depId => {
+        const depTask = store.tasks.find(t => t.id === depId)
+        return depTask && !depTask.completed
+    })
+}
+
+const isTaskDone = (id) => {
+    const t = store.tasks.find(t => t.id === id)
+    return t && t.completed
+}
+
+const getTaskTitle = (id) => {
+    const t = store.tasks.find(t => t.id === id)
+    return t ? t.title : 'Desconocida'
+}
 </script>
 
 <style scoped>
 .task-manager { max-width: 900px; margin: 0 auto; }
 
-/* --- Top Controls (Glass Bar) --- */
+/* ... Previous Styles ... */
+.glass-panel {
+    background: var(--surface-color);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--surface-border);
+}
+
 .top-controls {
     display: flex;
     justify-content: space-between;
@@ -317,9 +438,10 @@ const isOverdue = (task) => !task.completed && task.due_date && new Date(task.du
     padding: 6px 12px;
     border-radius: 8px;
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     transition: all 0.2s;
     opacity: 0.6;
+    color: var(--text-color);
 }
 
 .btn-toggle.active {
@@ -327,6 +449,7 @@ const isOverdue = (task) => !task.completed && task.due_date && new Date(task.du
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     opacity: 1;
     transform: scale(1.05);
+    color: var(--primary-color);
 }
 
 .btn-settings {
@@ -335,6 +458,9 @@ const isOverdue = (task) => !task.completed && task.due_date && new Date(task.du
     color: var(--primary-color);
     font-weight: 600;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 /* --- Task Form --- */
@@ -394,8 +520,17 @@ const isOverdue = (task) => !task.completed && task.due_date && new Date(task.du
     color: var(--text-muted);
     border: none;
     cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 .btn-text:hover { color: var(--text-color); }
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
 
 /* --- Task List & Grid --- */
 .list-header {
@@ -440,6 +575,51 @@ const isOverdue = (task) => !task.completed && task.due_date && new Date(task.du
     flex-direction: column;
 }
 
+.task-card.blocked {
+    opacity: 0.7;
+    background: rgba(120, 120, 128, 0.05);
+}
+
+/* Progress Bar */
+.progress-container {
+    height: 4px;
+    background: rgba(120, 120, 128, 0.1);
+    border-radius: 2px;
+    margin-bottom: 0.8rem;
+    overflow: hidden;
+}
+.progress-bar {
+    height: 100%;
+    background: var(--primary-color);
+    transition: width 0.5s ease;
+}
+
+.blocked-icon {
+    font-size: 0.9rem;
+    margin-right: 0.3rem;
+}
+
+/* Dependencies */
+.deps-list {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 0.8rem;
+}
+.dep-tag {
+    background: rgba(120, 120, 128, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 4px;
+    text-decoration: line-through; /* Default assumes blocked/incomplete logic style? No wait. */
+    text-decoration: none;
+}
+.dep-tag.done {
+    text-decoration: line-through;
+    opacity: 0.5;
+    background: rgba(52, 199, 89, 0.1);
+    color: var(--success-color);
+}
+
 /* Side accent for category color */
 .card-accent {
     position: absolute;
@@ -460,6 +640,7 @@ const isOverdue = (task) => !task.completed && task.due_date && new Date(task.du
     cursor: grab;
     color: var(--text-muted);
     opacity: 0.5;
+    font-size: 0.9rem;
 }
 
 .task-title {
@@ -503,6 +684,9 @@ const isOverdue = (task) => !task.completed && task.due_date && new Date(task.du
     background: rgba(120, 120, 128, 0.08);
     color: var(--text-muted);
     font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 .meta-badge.category {
     background: rgba(0, 122, 255, 0.1);
@@ -511,6 +695,9 @@ const isOverdue = (task) => !task.completed && task.due_date && new Date(task.du
 .meta-badge.date.danger {
     color: var(--danger-color);
     background: rgba(255, 59, 48, 0.1);
+}
+.meta-badge.subtask {
+    background: rgba(174, 174, 178, 0.2);
 }
 
 .tags-list {
@@ -547,12 +734,13 @@ const isOverdue = (task) => !task.completed && task.due_date && new Date(task.du
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: 0.9rem;
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     transition: transform 0.2s;
 }
 .action-btn:hover { transform: scale(1.1); }
 .action-btn.check { color: var(--success-color); }
+.action-btn.check:disabled { color: var(--text-muted); cursor: not-allowed; }
 .action-btn.delete { color: var(--danger-color); }
 
 /* Completed State */
