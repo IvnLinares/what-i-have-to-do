@@ -1,9 +1,9 @@
 <template>
-  <div class="calendar-view card">
+  <div class="calendar-view card hover-lift">
     <div class="calendar-header">
-      <button @click="prevMonth" class="btn btn-secondary">◀️</button>
+      <button @click="prevMonth" class="nav-btn">◀️</button>
       <h3>{{ monthName }} {{ currentYear }}</h3>
-      <button @click="nextMonth" class="btn btn-secondary">▶️</button>
+      <button @click="nextMonth" class="nav-btn">▶️</button>
     </div>
 
     <div class="calendar-grid">
@@ -116,10 +116,6 @@ const calendarDays = computed(() => {
 
   // Next month days (padding to complete grid)
   const remainingCells = 42 - days.length // 6 rows * 7 cols
-  // If remainingCells is negative (e.g. 5 weeks month), loop won't run.
-  // Actually 6 rows is usually enough (42 cells).
-  // Sometimes 5 rows is enough (35 cells).
-  // But let's fill up to 42 for consistency.
 
   for (let i = 1; i <= remainingCells; i++) {
     days.push({
@@ -149,8 +145,9 @@ const isOverdue = (task) => {
 
 <style scoped>
 .calendar-view {
-  margin-top: 2rem;
+  margin-top: 1rem;
   padding: 1.5rem;
+  /* Glass style inherited from .card */
 }
 
 .calendar-header {
@@ -164,7 +161,19 @@ const isOverdue = (task) => {
   text-transform: capitalize;
   margin: 0;
   font-size: 1.5rem;
+  font-weight: 700;
 }
+
+.nav-btn {
+    background: rgba(120, 120, 128, 0.1);
+    border: none;
+    border-radius: 50%;
+    width: 36px; height: 36px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.2s;
+}
+.nav-btn:hover { background: rgba(120, 120, 128, 0.2); }
 
 .calendar-grid {
   display: grid;
@@ -175,36 +184,43 @@ const isOverdue = (task) => {
 .day-name {
   text-align: center;
   padding: 0.5rem;
-  font-weight: bold;
+  font-weight: 600;
   color: var(--text-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .calendar-cell {
-  background-color: var(--bg-color);
-  min-height: 120px;
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: 1px solid var(--border-color);
+  background-color: rgba(120, 120, 128, 0.05);
+  min-height: 100px;
+  padding: 6px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
-  opacity: 0.4;
+  opacity: 0.5;
+  transition: opacity 0.2s;
 }
 
 .calendar-cell.current-month {
-  background-color: var(--surface-color);
+  background-color: rgba(120, 120, 128, 0.1);
   opacity: 1;
 }
 
 .calendar-cell.today {
   border: 2px solid var(--primary-color);
-  background-color: rgba(99, 102, 241, 0.05);
+  background-color: rgba(0, 122, 255, 0.05);
 }
 
 .day-number {
-  font-weight: bold;
-  margin-bottom: 0.5rem;
+  font-weight: 600;
+  margin-bottom: 4px;
   font-size: 0.9rem;
   color: var(--text-muted);
+}
+
+.calendar-cell.today .day-number {
+    color: var(--primary-color);
 }
 
 .day-tasks {
@@ -217,20 +233,21 @@ const isOverdue = (task) => {
 
 .calendar-task {
   font-size: 0.75rem;
-  padding: 4px 6px;
-  border-radius: 4px;
-  background-color: var(--bg-color);
+  padding: 3px 6px;
+  border-radius: 6px;
+  background-color: var(--surface-color);
   border-left: 3px solid #ccc;
   cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   transition: transform 0.1s;
 }
 
 .calendar-task:hover {
     transform: scale(1.02);
+    z-index: 2;
 }
 
 .calendar-task.priority-high { border-left-color: var(--danger-color); }
@@ -243,7 +260,7 @@ const isOverdue = (task) => {
 }
 
 .calendar-task.overdue {
-  background-color: rgba(239, 68, 68, 0.1);
-  border: 1px solid var(--danger-color);
+  background-color: rgba(255, 59, 48, 0.1);
+  border-left-color: var(--danger-color);
 }
 </style>
