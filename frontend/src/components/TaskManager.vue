@@ -206,7 +206,7 @@
                             <div class="task-top">
                                 <div class="drag-handle"><font-awesome-icon icon="grip" /></div>
                                 <h4 class="task-title">
-                                    <span v-if="isBlocked(task)" class="blocked-icon" title="Bloqueada por dependencias">🔒</span>
+                                    <font-awesome-icon v-if="isBlocked(task)" icon="lock" class="blocked-icon" title="Bloqueada por dependencias" />
                                     {{ task.title }}
                                 </h4>
                                 <span class="priority-dot" :class="task.priority"></span>
@@ -597,6 +597,7 @@ const getTaskTitle = (id) => {
 .blocked-icon {
     font-size: 0.9rem;
     margin-right: 0.3rem;
+    color: var(--warning-color);
 }
 
 /* Dependencies */
@@ -741,6 +742,7 @@ const getTaskTitle = (id) => {
 .action-btn:hover { transform: scale(1.1); }
 .action-btn.check { color: var(--success-color); }
 .action-btn.check:disabled { color: var(--text-muted); cursor: not-allowed; }
+.action-btn.edit { color: var(--primary-color); }
 .action-btn.delete { color: var(--danger-color); }
 
 /* Completed State */
@@ -760,8 +762,85 @@ const getTaskTitle = (id) => {
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
 
+/* --- Responsive Design --- */
+@media (max-width: 968px) {
+    .tasks-wrapper.grid .drag-area {
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+    }
+}
+
 @media (max-width: 768px) {
-    .task-actions-overlay { opacity: 1; transform: translateY(0); margin-top: 1rem; }
-    .form-row { flex-direction: column; gap: 0; }
+    .task-form, .task-search {
+        padding: 1rem;
+    }
+    
+    .task-actions-overlay { 
+        opacity: 1; 
+        transform: translateY(0); 
+        margin-top: 1rem; 
+    }
+    
+    .form-row { 
+        flex-direction: column; 
+        gap: 0; 
+    }
+    
+    .tasks-wrapper.grid .drag-area {
+        grid-template-columns: 1fr;
+    }
+    
+    .list-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+    
+    .stats-pills {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .task-title {
+        font-size: 1rem;
+        white-space: normal;
+    }
+    
+    .task-card {
+        padding: 1rem;
+        border-radius: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    .task-form h2, .list-header h3 {
+        font-size: 1.1rem;
+    }
+    
+    .form-actions {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .form-actions button {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .tag-chip {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+    }
+    
+    .task-meta {
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+    
+    .action-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 1rem;
+    }
 }
 </style>

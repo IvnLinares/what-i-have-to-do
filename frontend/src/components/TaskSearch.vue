@@ -2,7 +2,7 @@
   <div class="task-search card hover-lift">
     <div class="search-bar-container">
         <div class="search-input-wrapper">
-            <span class="search-icon">🔍</span>
+            <font-awesome-icon icon="magnifying-glass" class="search-icon" />
             <input
                 v-model="searchQuery"
                 type="text"
@@ -28,12 +28,12 @@
 
         <div class="sort-wrapper">
             <select v-model="sortOption" class="sort-select">
-                <option value="smart">✨ Inteligente</option>
-                <option value="date-desc">📅 Recientes</option>
-                <option value="date-asc">📅 Antiguas</option>
-                <option value="priority-desc">🔥 Alta Prio</option>
-                <option value="priority-asc">❄️ Baja Prio</option>
-                <option value="alpha-asc">🔤 A-Z</option>
+                <option value="smart"><font-awesome-icon icon="star" /> Inteligente</option>
+                <option value="date-desc"><font-awesome-icon icon="calendar" /> Recientes</option>
+                <option value="date-asc"><font-awesome-icon icon="calendar" /> Antiguas</option>
+                <option value="priority-desc"><font-awesome-icon icon="fire" /> Alta Prio</option>
+                <option value="priority-asc"><font-awesome-icon icon="snowflake" /> Baja Prio</option>
+                <option value="alpha-asc"><font-awesome-icon icon="font" /> A-Z</option>
             </select>
         </div>
     </div>
@@ -66,7 +66,7 @@
         <!-- Category Dropdown (styled) -->
         <div class="category-select-wrapper">
             <select v-model="categoryFilter" class="chip-select">
-                <option :value="null">📂 Todas</option>
+                <option :value="null"><font-awesome-icon icon="folder" /> Todas</option>
                 <option v-for="cat in categories" :key="cat.id" :value="cat.id">
                     {{ cat.name }}
                 </option>
@@ -283,10 +283,72 @@ watch(() => taskStore.searchQuery, (newVal) => {
     cursor: pointer;
 }
 
-@media (max-width: 600px) {
-    .filters-row { gap: 0.8rem; }
-    .search-bar-container { flex-direction: column; }
-    .sort-wrapper { width: 100%; }
-    .sort-select { width: 100%; }
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+    .task-search {
+        padding: 1rem;
+    }
+    
+    .filters-row { 
+        gap: 0.8rem; 
+        justify-content: center;
+    }
+    
+    .search-bar-container { 
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    
+    .sort-wrapper { 
+        width: 100%; 
+    }
+    
+    .sort-select { 
+        width: 100%; 
+    }
+    
+    .separator {
+        display: none;
+    }
+    
+    .filter-chips {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .priority-toggles {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .task-search {
+        padding: 0.85rem;
+    }
+    
+    .search-input {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 8px 8px 8px 36px;
+    }
+    
+    .search-icon {
+        left: 10px;
+        font-size: 0.9rem;
+    }
+    
+    .chip {
+        font-size: 0.8rem;
+        padding: 5px 10px;
+    }
+    
+    .prio-btn {
+        width: 20px;
+        height: 20px;
+    }
+    
+    .sort-select, .chip-select {
+        font-size: 0.8rem;
+        padding: 8px 12px;
+    }
 }
 </style>

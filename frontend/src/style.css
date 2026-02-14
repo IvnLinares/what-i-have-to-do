@@ -29,6 +29,10 @@
   --glass-blur: 25px;
   --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
 
+  /* Border colors */
+  --border-color: rgba(0, 0, 0, 0.1);
+  --surface-color: rgba(255, 255, 255, 0.5);
+
   /* Squircles & Spacing */
   --card-radius: 24px;  /* Prominent squircle-like radius */
   --btn-radius: 14px;
@@ -57,6 +61,9 @@
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 
+  --border-color: rgba(255, 255, 255, 0.1);
+  --surface-color: rgba(255, 255, 255, 0.05);
+
   --primary-color: #0A84FF; /* iOS Dark Mode Blue */
 }
 
@@ -80,7 +87,7 @@ body {
 }
 
 #app {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
 }
@@ -152,4 +159,94 @@ button.btn {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--text-muted);
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 1024px) {
+  #app {
+    max-width: 100%;
+    padding: 1.5rem 1.25rem;
+  }
+}
+
+@media (max-width: 768px) {
+  #app {
+    padding: 1.5rem 1rem;
+  }
+  
+  h1 { font-size: 2rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  
+  input, textarea, select {
+    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 10px 14px;
+  }
+  
+  button.btn {
+    padding: 10px 20px;
+    font-size: 0.95rem;
+  }
+  
+  .card, .glass-panel {
+    border-radius: 16px;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  #app {
+    padding: 1rem 0.75rem;
+  }
+  
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.35rem; }
+  h3 { font-size: 1.15rem; }
+  
+  .card, .glass-panel {
+    border-radius: 14px;
+    padding: 0.85rem;
+  }
+  
+  button.btn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+/* --- Utility Classes --- */
+.text-center { text-align: center; }
+.text-muted { color: var(--text-muted); }
+.text-danger { color: var(--danger-color); }
+.text-success { color: var(--success-color); }
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+
+.hidden { display: none; }
+
+/* Loading spinner */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 3px solid var(--glass-border);
+  border-top-color: var(--primary-color);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  color: var(--text-muted);
 }

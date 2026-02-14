@@ -8,7 +8,7 @@
     </button>
 
     <header>
-      <h1>🚀 Copilot Testing Sandbox</h1>
+      <h1><font-awesome-icon icon="rocket" /> What I have to do?</h1>
 
       <!-- User Info Pill -->
       <transition name="fade">
@@ -34,7 +34,7 @@
     </main>
 
     <footer>
-      <p>Diseñado con ❤️ y Copilot</p>
+      <p>Diseñado con <font-awesome-icon icon="heart" class="icon-heart" /> y Copilot</p>
     </footer>
   </div>
 </template>
@@ -61,7 +61,7 @@ const handleLogout = () => {
 header {
   text-align: center;
   margin-bottom: 3rem;
-  padding: 1rem 0;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -71,15 +71,21 @@ header h1 {
   background: linear-gradient(135deg, var(--primary-color), #A855F7);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  font-size: 2.8rem;
+  background-clip: text;
+  font-size: clamp(2rem, 5vw, 2.8rem);
   margin-bottom: 0.5rem;
   letter-spacing: -0.03em;
   font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .subtitle {
   color: var(--text-muted);
-  font-size: 1.1rem;
+  font-size: clamp(1rem, 3vw, 1.1rem);
+  padding: 0 1rem;
 }
 
 /* --- Theme Toggle --- */
@@ -102,6 +108,11 @@ header h1 {
     justify-content: center;
     transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     color: var(--text-color);
+}
+
+.theme-toggle:hover {
+  transform: translateY(-2px) rotate(15deg);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
 }
 
 /* --- User Info Pill (Glass) --- */
@@ -154,6 +165,18 @@ header h1 {
   color: var(--danger-color);
 }
 
+/* --- Icon Animations --- */
+.icon-heart {
+  color: var(--danger-color);
+  animation: heartbeat 1.5s infinite;
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  20%, 40% { transform: scale(1.1); }
+  30%, 50% { transform: scale(1); }
+}
+
 /* --- Page Transitions --- */
 .scale-fade-enter-active,
 .scale-fade-leave-active {
@@ -177,5 +200,50 @@ footer {
   color: var(--text-muted);
   font-size: 0.9rem;
   opacity: 0.8;
+}
+
+/* --- Responsive Design --- */
+@media (max-width: 768px) {
+  .theme-toggle {
+    width: 44px;
+    height: 44px;
+    font-size: 1.1rem;
+    top: 15px;
+    right: 15px;
+  }
+  
+  header h1 {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  
+  .user-info {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .user-welcome {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  header {
+    padding: 0.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .theme-toggle {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+  }
+  
+  footer {
+    padding: 2rem 0;
+    margin-top: 3rem;
+    font-size: 0.85rem;
+  }
 }
 </style>

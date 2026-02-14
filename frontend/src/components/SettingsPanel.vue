@@ -1,6 +1,6 @@
 <template>
   <div class="settings-panel">
-    <h3>⚙️ Configuración</h3>
+    <h3><font-awesome-icon icon="gear" /> Configuración</h3>
 
     <div class="settings-section">
         <h4>Apariencia</h4>
@@ -22,7 +22,7 @@
             >
                 {{ loading ? 'Activando...' : 'Activar' }}
             </button>
-            <span v-else-if="isSubscribed" class="badge-success">✅ Activadas</span>
+            <span v-else-if="isSubscribed" class="badge-success"><font-awesome-icon icon="circle-check" /> Activadas</span>
             <span v-else class="text-muted">No soportado</span>
         </div>
     </div>
@@ -50,38 +50,85 @@ onMounted(() => {
 
 <style scoped>
 .settings-panel {
-    background: var(--surface-color);
-    padding: 1.5rem;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
+    background: var(--glass-surface);
+    backdrop-filter: blur(var(--glass-blur));
+    padding: 2rem;
+    border-radius: var(--card-radius);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
     margin-bottom: 2rem;
-    backdrop-filter: blur(10px);
 }
 
 .settings-section {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
 }
 
 .setting-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.5rem 0;
+    padding: 0.75rem 0;
 }
 
-h3 { margin-top: 0; }
-h4 { margin-bottom: 0.5rem; color: var(--primary-color); }
+h3 { 
+    margin-top: 0;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.5rem;
+}
+
+h4 { 
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+hr {
+    border: none;
+    border-top: 1px solid var(--glass-border);
+    margin: 2rem 0;
+}
 
 .badge-success {
     color: var(--success-color);
-    font-weight: bold;
+    font-weight: 600;
     font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
 }
 
 .text-muted { color: var(--text-muted); }
 
 .btn-sm {
-    padding: 0.3rem 0.8rem;
+    padding: 0.4rem 1rem;
     font-size: 0.9rem;
+    border-radius: var(--btn-radius);
+}
+
+@media (max-width: 768px) {
+    .settings-panel {
+        padding: 1.5rem;
+    }
+    
+    h3 {
+        font-size: 1.3rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .settings-panel {
+        padding: 1rem;
+    }
+    
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
 }
 </style>

@@ -11,14 +11,22 @@ import {
     faSun, faMoon, faEdit, faTrash, faSearch, faList, faGrip,
     faCalendarDays, faGear, faPlus, faSave, faXmark, faUndo,
     faCheck, faCircle, faFolder, faChevronLeft, faChevronRight,
-    faTriangleExclamation, faUser, faRightFromBracket, faCloudArrowUp, faBell
+    faTriangleExclamation, faUser, faRightFromBracket, faCloudArrowUp, faBell,
+    faLock, faRocket, faHeart, faMagnifyingGlass, faSortAmountDown,
+    faCalendar, faFire, faSnowflake, faFont, faTag, faCircleCheck,
+    faCircleXmark, faBars, faTags, faGripVertical, faClock, faStar,
+    faFilter, faArrowDown, faArrowUp
 } from '@fortawesome/free-solid-svg-icons'
 
 library.add(
     faSun, faMoon, faEdit, faTrash, faSearch, faList, faGrip,
     faCalendarDays, faGear, faPlus, faSave, faXmark, faUndo,
     faCheck, faCircle, faFolder, faChevronLeft, faChevronRight,
-    faTriangleExclamation, faUser, faRightFromBracket, faCloudArrowUp, faBell
+    faTriangleExclamation, faUser, faRightFromBracket, faCloudArrowUp, faBell,
+    faLock, faRocket, faHeart, faMagnifyingGlass, faSortAmountDown,
+    faCalendar, faFire, faSnowflake, faFont, faTag, faCircleCheck,
+    faCircleXmark, faBars, faTags, faGripVertical, faClock, faStar,
+    faFilter, faArrowDown, faArrowUp
 )
 
 const app = createApp(App)
