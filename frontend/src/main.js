@@ -15,8 +15,9 @@ import {
     faLock, faRocket, faHeart, faMagnifyingGlass, faSortAmountDown,
     faCalendar, faFire, faSnowflake, faFont, faTag, faCircleCheck,
     faCircleXmark, faBars, faTags, faGripVertical, faClock, faStar,
-    faFilter, faArrowDown, faArrowUp
+    faFilter, faArrowDown, faArrowUp, faPlug, faRotate, faFileLines
 } from '@fortawesome/free-solid-svg-icons'
+import { faGoogle, faApple } from '@fortawesome/free-brands-svg-icons'
 
 library.add(
     faSun, faMoon, faEdit, faTrash, faSearch, faList, faGrip,
@@ -26,7 +27,8 @@ library.add(
     faLock, faRocket, faHeart, faMagnifyingGlass, faSortAmountDown,
     faCalendar, faFire, faSnowflake, faFont, faTag, faCircleCheck,
     faCircleXmark, faBars, faTags, faGripVertical, faClock, faStar,
-    faFilter, faArrowDown, faArrowUp
+    faFilter, faArrowDown, faArrowUp, faPlug, faRotate, faFileLines,
+    faGoogle, faApple
 )
 
 const app = createApp(App)

@@ -11,8 +11,10 @@ const authRoutes = require('./src/routes/authRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const tagRoutes = require('./src/routes/tagRoutes');
 const pushRoutes = require('./src/routes/pushRoutes');
+const integrationRoutes = require('./src/routes/integrationRoutes');
 const errorHandler = require('./src/middleware/errorHandler');
 const reminderService = require('./src/services/reminderService');
+const syncService = require('./src/integrations/sync-service');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -41,6 +43,7 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/push', pushRoutes);
+app.use('/api/integrations', integrationRoutes);
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
