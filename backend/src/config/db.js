@@ -182,6 +182,7 @@ function initializeDatabase() {
       refresh_token TEXT,
       settings TEXT,
       last_sync DATETIME,
+      last_sync_status TEXT, -- 'success', 'error', 'pending'
       connected BOOLEAN DEFAULT 1,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
@@ -189,8 +190,20 @@ function initializeDatabase() {
       FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `, (err) => {
-      if (err) console.error('Error creating integrations table:', err.message);
-      else console.log('Integrations table ready');
+      if (err) {
+          console.error('Error creating integrations table:', err.message);
+      } else {
+          console.log('Integrations table ready');
+          // Add column migration if missing
+          db.all("PRAGMA table_info(integrations)", [], (err, rows) => {
+              if (err) return;
+              const hasStatus = rows.some(r => r.name === 'last_sync_status');
+              if (!hasStatus) {
+                  console.log("Adding last_sync_status column to integrations...");
+                  db.run("ALTER TABLE integrations ADD COLUMN last_sync_status TEXT");
+              }
+          });
+      }
   });
 
   // Sync Logs Table

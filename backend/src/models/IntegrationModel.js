@@ -44,8 +44,11 @@ class IntegrationModel {
         return db.get('SELECT * FROM integrations WHERE user_id = ? AND service = ?', [userId, service]);
     }
 
-    static async updateLastSync(id) {
-        return db.run('UPDATE integrations SET last_sync = CURRENT_TIMESTAMP WHERE id = ?', [id]);
+    static async updateLastSync(id, status = 'success') {
+        return db.run(
+            'UPDATE integrations SET last_sync = CURRENT_TIMESTAMP, last_sync_status = ? WHERE id = ?',
+            [status, id]
+        );
     }
 
     static async delete(userId, service) {

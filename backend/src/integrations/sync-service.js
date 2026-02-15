@@ -47,10 +47,13 @@ class SyncService {
                 // Notion sync logic
             }
 
-            await IntegrationModel.updateLastSync(integration.id);
+            await IntegrationModel.updateLastSync(integration.id, 'success');
             await IntegrationModel.logSync(integration.id, 'success', 'Sync completed successfully');
         } catch (error) {
-             throw error;
+            console.error(`Error syncing ${integration.service}:`, error);
+            await IntegrationModel.updateLastSync(integration.id, 'error');
+            await IntegrationModel.logSync(integration.id, 'error', error.message);
+            // Don't rethrow to avoid stopping loop
         }
     }
 }

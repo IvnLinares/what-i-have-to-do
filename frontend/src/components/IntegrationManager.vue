@@ -18,9 +18,13 @@
           <font-awesome-icon :icon="['fab', 'google']" class="service-icon google" />
           <div class="info">
             <h4>Google Calendar</h4>
-            <span class="status">
-              {{ isConnected('google-calendar') ? 'Conectado' : 'Desconectado' }}
-            </span>
+            <div class="status-row">
+              <span v-if="isConnected('google-calendar')" class="status-dot" :class="getLastSyncStatus('google-calendar')"></span>
+              <span class="status">
+                {{ isConnected('google-calendar') ? 'Conectado' : 'Desconectado' }}
+              </span>
+              <font-awesome-icon v-if="store.loading && isConnected('google-calendar')" icon="rotate" spin class="sync-spinner" />
+            </div>
           </div>
           <label class="switch">
             <input
@@ -45,9 +49,13 @@
           <font-awesome-icon :icon="['fab', 'apple']" class="service-icon apple" />
           <div class="info">
             <h4>iCloud Calendar</h4>
-            <span class="status">
-              {{ isConnected('icloud-calendar') ? 'Conectado' : 'Desconectado' }}
-            </span>
+            <div class="status-row">
+              <span v-if="isConnected('icloud-calendar')" class="status-dot" :class="getLastSyncStatus('icloud-calendar')"></span>
+              <span class="status">
+                {{ isConnected('icloud-calendar') ? 'Conectado' : 'Desconectado' }}
+              </span>
+              <font-awesome-icon v-if="store.loading && isConnected('icloud-calendar')" icon="rotate" spin class="sync-spinner" />
+            </div>
           </div>
           <button @click="openIcloudModal" class="btn-config" :class="{ active: isConnected('icloud-calendar') }">
             <font-awesome-icon :icon="isConnected('icloud-calendar') ? 'gear' : 'plus'" />
@@ -68,9 +76,13 @@
           <font-awesome-icon icon="file-lines" class="service-icon notion" />
           <div class="info">
             <h4>Notion</h4>
-            <span class="status">
-              {{ isConnected('notion') ? 'Conectado' : 'Desconectado' }}
-            </span>
+            <div class="status-row">
+              <span v-if="isConnected('notion')" class="status-dot" :class="getLastSyncStatus('notion')"></span>
+              <span class="status">
+                {{ isConnected('notion') ? 'Conectado' : 'Desconectado' }}
+              </span>
+              <font-awesome-icon v-if="store.loading && isConnected('notion')" icon="rotate" spin class="sync-spinner" />
+            </div>
           </div>
           <label class="switch">
             <input
@@ -139,6 +151,12 @@ const isConnected = (service) => {
 const getLastSync = (service) => {
   const integration = store.integrations.find(i => i.service === service)
   return integration ? integration.last_sync : null
+}
+
+const getLastSyncStatus = (service) => {
+  const integration = store.integrations.find(i => i.service === service)
+  if (!integration || !integration.connected) return ''
+  return integration.last_sync_status || 'pending'
 }
 
 const formatTime = (isoString) => {
@@ -268,6 +286,16 @@ const disconnect = async (service) => {
 .info { flex: 1; }
 .info h4 { margin: 0; font-size: 1rem; }
 .status { font-size: 0.8rem; color: var(--text-muted); }
+
+.status-row { display: flex; align-items: center; gap: 6px; }
+.status-dot {
+    width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+    background: var(--text-muted);
+}
+.status-dot.success { background: var(--success-color); box-shadow: 0 0 5px var(--success-color); }
+.status-dot.error { background: var(--danger-color); box-shadow: 0 0 5px var(--danger-color); }
+.status-dot.pending { background: var(--warning-color); }
+.sync-spinner { font-size: 0.8rem; color: var(--text-muted); margin-left: 4px; }
 
 .card-footer {
     margin-top: 0.8rem;
