@@ -3,7 +3,10 @@ node_modules/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
+# Allow frontend package-lock for CI/CD
+!frontend/package-lock.json
+# But ignore backend package-lock
+backend/package-lock.json
 
 # Database
 *.db
