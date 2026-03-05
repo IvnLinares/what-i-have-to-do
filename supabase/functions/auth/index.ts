@@ -25,17 +25,13 @@ async function loginUser(username: string, password: string) {
       return { error: "Invalid credentials", status: 401 }
     }
 
-    // Simple password verification (in production, use bcrypt properly)
-    const { data: { session }, error: authError } = await supabase.auth.signInWithPassword({
-      email: `${username}@copilot-testing.local`,
-      password: password,
-    })
-
-    if (authError) {
-      // Fallback: Direct password check (simplified for demo)
-      // In production, passwords should be hashed with bcrypt
+    // Simple password verification (in production, use bcrypt)
+    if (user.password !== password) {
       return { error: "Invalid credentials", status: 401 }
     }
+
+    // Generate token (base64 encoded JSON)
+    const token = btoa(JSON.stringify({ user_id: user.id, username }))
 
     return {
       user: {
@@ -43,7 +39,7 @@ async function loginUser(username: string, password: string) {
         username: user.username,
         role: user.role,
       },
-      token: session?.access_token || "temp_token",
+      token,
       status: 200
     }
   } catch (error) {
@@ -75,12 +71,16 @@ async function registerUser(username: string, password: string) {
       return { error: insertError.message, status: 400 }
     }
 
+    // Generate token (base64 encoded JSON)
+    const token = btoa(JSON.stringify({ user_id: user.id, username }))
+
     return {
       user: {
         id: user.id,
         username: user.username,
         role: user.role,
       },
+      token,
       status: 201
     }
   } catch (error) {
