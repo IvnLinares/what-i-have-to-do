@@ -47,6 +47,24 @@
           </div>
         </transition>
 
+        <!-- Registration Success Modal -->
+        <transition name="modal-fade">
+          <div v-if="authStore.registrationMessage" class="modal-overlay" @click="closeModal">
+            <div class="modal-content glass-panel" @click.stop>
+              <div class="modal-header">
+                <div class="success-brand-icon">
+                  <font-awesome-icon icon="fa-solid fa-envelope-circle-check" />
+                </div>
+                <h3>¡Casi listo!</h3>
+              </div>
+              <p class="modal-text">{{ authStore.registrationMessage }}</p>
+              <button class="btn btn-primary w-100 modal-btn" @click="closeModal">
+                Entendido
+              </button>
+            </div>
+          </div>
+        </transition>
+
         <button type="submit" class="btn btn-primary w-100 hover-lift submit-btn" :disabled="authStore.loading">
           <span v-if="authStore.loading" class="spinner btn-spinner"></span>
           <span v-else>{{ isLogin ? 'Entrar' : 'Registrarse' }}</span>
@@ -80,7 +98,13 @@ const form = ref({ email: '', password: '', username: '' })
 const toggleMode = () => {
   isLogin.value = !isLogin.value
   authStore.error = null
+  authStore.registrationMessage = null
   form.value = { email: '', password: '', username: '' }
+}
+
+const closeModal = () => {
+  authStore.registrationMessage = null
+  isLogin.value = true // Switch to login after registration success
 }
 
 const handleSubmit = async () => {
@@ -104,7 +128,12 @@ const handleSubmit = async () => {
   }
 
   if (success) {
-    router.push('/')
+    if (isLogin.value || authStore.session) {
+      router.push('/')
+    } else {
+      // Clear form on successful registration so user sees the message clearly
+      form.value = { email: '', password: '', username: '' }
+    }
   }
 }
 </script>
@@ -287,6 +316,24 @@ label {
   font-size: 1.1rem;
 }
 
+/* Success Message Customization */
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--success-color, #34c759);
+  background: rgba(52, 199, 89, 0.1);
+  border: 1px solid rgba(52, 199, 89, 0.2);
+  padding: 1rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.success-icon {
+  font-size: 1.1rem;
+}
+
 /* Footer / Switch Mode */
 .auth-footer {
   text-align: center;
@@ -312,6 +359,89 @@ label {
 .switch-link:hover {
   text-decoration: underline;
   color: var(--primary-hover);
+}
+
+/* Success Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  width: 100%;
+  max-width: 380px;
+  padding: 2.5rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2), 0 0 0 1px var(--glass-border);
+  animation: modal-slide-in 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.success-brand-icon {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #34c759, #28a745);
+  color: white;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  margin: 0 auto 1rem;
+  box-shadow: 0 8px 20px rgba(52, 199, 89, 0.3);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.modal-text {
+  font-size: 1.05rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
+.modal-btn {
+  padding: 12px;
+  font-weight: 600;
+  border-radius: 12px;
+}
+
+@keyframes modal-slide-in {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
 }
 
 /* Transitions */

@@ -6,7 +6,8 @@ export const useAuthStore = defineStore('auth', {
     user: null,
     session: null,
     loading: false,
-    error: null
+    error: null,
+    registrationMessage: null
   }),
   getters: {
     isAuthenticated: (state) => !!state.session,
@@ -35,6 +36,7 @@ export const useAuthStore = defineStore('auth', {
     async register(email, password, username) {
       this.loading = true
       this.error = null
+      this.registrationMessage = null
       try {
         const { data, error } = await supabase.auth.signUp({
           email,
@@ -46,8 +48,14 @@ export const useAuthStore = defineStore('auth', {
           }
         })
         if (error) throw error
-        this.session = data.session
+        
         this.user = data.user
+        this.session = data.session
+
+        if (!data.session && data.user) {
+          this.registrationMessage = '¡Registro casi completo! Por favor, revisa tu correo para confirmar tu cuenta.'
+        }
+        
         return true
       } catch (err) {
         this.error = err.message || 'Registration failed'
