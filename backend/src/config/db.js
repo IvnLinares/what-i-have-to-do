@@ -140,6 +140,24 @@ function initializeDatabase() {
            console.log("Adding parent_id column to tasks table...");
            db.run("ALTER TABLE tasks ADD COLUMN parent_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE");
         }
+
+        const hasSyncedToICloud = rows.some(row => row.name === 'synced_to_icloud');
+        if (!hasSyncedToICloud) {
+           console.log("Adding synced_to_icloud column to tasks table...");
+           db.run("ALTER TABLE tasks ADD COLUMN synced_to_icloud BOOLEAN DEFAULT 0");
+        }
+
+        const hasSyncedToNotion = rows.some(row => row.name === 'synced_to_notion');
+        if (!hasSyncedToNotion) {
+           console.log("Adding synced_to_notion column to tasks table...");
+           db.run("ALTER TABLE tasks ADD COLUMN synced_to_notion BOOLEAN DEFAULT 0");
+        }
+
+        const hasSyncedToGoogle = rows.some(row => row.name === 'synced_to_google');
+        if (!hasSyncedToGoogle) {
+           console.log("Adding synced_to_google column to tasks table...");
+           db.run("ALTER TABLE tasks ADD COLUMN synced_to_google BOOLEAN DEFAULT 0");
+        }
       });
     }
   });

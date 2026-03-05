@@ -98,9 +98,17 @@ router.post('/connect/icloud', async (req, res) => {
     const { email, password } = req.body;
     try {
         const userId = getUserId(req);
+        console.log(`[iCloud] Connection attempt for user ${userId}, email: ${email?.substring(0, 3)}...`);
+        
+        if (!email || !password) {
+            return res.status(400).json({ error: 'Email and password are required' });
+        }
+        
         await ICloudService.connect(userId, email, password);
-        res.json({ success: true });
+        console.log(`[iCloud] Connection successful for user ${userId}`);
+        res.json({ success: true, message: 'iCloud connected successfully' });
     } catch (error) {
+        console.error(`[iCloud] Connection error for user:`, error.message);
         res.status(400).json({ error: error.message });
     }
 });

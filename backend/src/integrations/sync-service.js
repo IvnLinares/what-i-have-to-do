@@ -3,7 +3,7 @@ const IntegrationModel = require('../models/IntegrationModel');
 const TaskModel = require('../models/taskModel');
 const GoogleCalendarService = require('./google-calendar');
 const NotionService = require('./notion');
-// const ICloudService = require('./icloud-calendar'); // If implemented
+const ICloudService = require('./icloud-calendar');
 
 class SyncService {
     constructor() {
@@ -42,6 +42,21 @@ class SyncService {
                     // In a real app, we should store external_id in a separate table or column.
                     // For now, let's just log it.
                     // await TaskModel.create({ ... });
+                }
+            } else if (integration.service === 'icloud-calendar') {
+                console.log('Syncing iCloud Calendar integration');
+                // iCloud sync logic - get tasks from local database and sync to iCloud
+                const tasks = await TaskModel.findByUser(integration.user_id);
+                for (const task of tasks) {
+                    if (!task.synced_to_icloud) {
+                        try {
+                            await ICloudService.createTask(integration.user_id, task);
+                            // Update task to mark as synced
+                            await TaskModel.update(task.id, { synced_to_icloud: 1 });
+                        } catch (error) {
+                            console.error(`Failed to sync task ${task.id} to iCloud:`, error.message);
+                        }
+                    }
                 }
             } else if (integration.service === 'notion') {
                 // Notion sync logic

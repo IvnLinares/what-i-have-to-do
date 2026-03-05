@@ -25,7 +25,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Serve static files from the React/Vue frontend app
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
+// app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 // Start Reminder Service
 reminderService.start();
@@ -47,9 +47,9 @@ app.use('/api/integrations', integrationRoutes);
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-});
+// app.get(/.*/, (req, res) => {
+//   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+// });
 
 // Error Handling
 app.use(errorHandler);

@@ -27,7 +27,7 @@ export const useIntegrationStore = defineStore('integration', {
       this.loading = true
       this.error = null
       try {
-        await api.post('/integrations/auth/icloud', credentials)
+        await api.post('/integrations/connect/icloud', credentials)
         await this.fetchIntegrations()
         return true
       } catch (err) {

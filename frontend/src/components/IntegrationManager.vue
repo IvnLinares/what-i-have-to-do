@@ -215,8 +215,8 @@ const disconnect = async (service) => {
 
 <style scoped>
 .integration-manager {
-    margin-top: 2rem;
-    padding-top: 1rem;
+    margin-top: 2.5rem;
+    padding-top: 2rem;
     border-top: 1px solid var(--glass-border);
 }
 
@@ -224,15 +224,17 @@ const disconnect = async (service) => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
 }
 
 .header h3 {
     margin: 0;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.75rem;
 }
 
 .btn-sync {
@@ -249,15 +251,18 @@ const disconnect = async (service) => {
 .integrations-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 1.25rem;
 }
 
 .integration-card {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
-    padding: 1rem;
+    padding: 1.25rem;
     transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 
 .integration-card.connected {
@@ -268,26 +273,28 @@ const disconnect = async (service) => {
 .card-header {
     display: flex;
     align-items: center;
-    gap: 1rem;
+    gap: 1.25rem;
+    padding-bottom: 0.5rem;
 }
 
 .service-icon {
-    font-size: 1.8rem;
-    width: 40px;
-    height: 40px;
+    font-size: 2rem;
+    width: 48px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex-shrink: 0;
 }
 .service-icon.google { color: #4285F4; }
 .service-icon.apple { color: #A2AAAD; }
 .service-icon.notion { color: var(--text-color); }
 
 .info { flex: 1; }
-.info h4 { margin: 0; font-size: 1rem; }
-.status { font-size: 0.8rem; color: var(--text-muted); }
+.info h4 { margin: 0; font-size: 1.05rem; font-weight: 600; }
+.status { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.25rem; }
 
-.status-row { display: flex; align-items: center; gap: 6px; }
+.status-row { display: flex; align-items: center; gap: 8px; margin-top: 0.5rem; }
 .status-dot {
     width: 8px; height: 8px; border-radius: 50%; display: inline-block;
     background: var(--text-muted);
@@ -298,14 +305,15 @@ const disconnect = async (service) => {
 .sync-spinner { font-size: 0.8rem; color: var(--text-muted); margin-left: 4px; }
 
 .card-footer {
-    margin-top: 0.8rem;
-    padding-top: 0.8rem;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255,255,255,0.08);
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 0.8rem;
     color: var(--text-muted);
+    gap: 1rem;
 }
 
 .btn-link {
@@ -377,17 +385,17 @@ input:checked + .slider:before { transform: translateX(20px); }
 }
 .modal-content {
     background: var(--surface-color);
-    padding: 2rem;
+    padding: 2.5rem;
     border-radius: 20px;
     width: 90%;
-    max-width: 400px;
+    max-width: 420px;
 }
-.helper-text { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.5rem; }
-.help-link { font-size: 0.8rem; color: var(--primary-color); display: block; margin-top: 0.3rem; }
+.helper-text { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.75rem; }
+.help-link { font-size: 0.8rem; color: var(--primary-color); display: block; margin-top: 0.5rem; text-decoration: none; }
 .modal-actions {
     display: flex;
     justify-content: flex-end;
     gap: 1rem;
-    margin-top: 2rem;
+    margin-top: 2.5rem;
 }
 </style>
