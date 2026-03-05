@@ -1,9 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const taskController = require('../controllers/taskController');
+const cleanupService = require('../services/cleanupService');
 const validate = require('../middleware/validate');
 const { taskSchema, updateTaskSchema } = require('../schemas/taskSchema');
 const authMiddleware = require('../middleware/authMiddleware');
+
+// Public route: Get retention policy
+router.get('/policy/retention', (req, res) => {
+  res.json(cleanupService.getRetentionPolicy());
+});
 
 router.use(authMiddleware);
 

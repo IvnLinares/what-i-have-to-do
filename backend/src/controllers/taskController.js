@@ -1,4 +1,5 @@
 const TaskModel = require('../models/taskModel');
+const cleanupService = require('../services/cleanupService');
 
 const getAllTasks = async (req, res, next) => {
   try {
@@ -32,11 +33,25 @@ const getTaskById = async (req, res, next) => {
 
 const createTask = async (req, res, next) => {
   try {
+    // Check task limit before creating
+    const limitCheck = await cleanupService.checkTaskLimit(req.user.id);
+    
+    if (!limitCheck.allowed) {
+      return res.status(429).json({
+        error: 'Task limit reached',
+        details: limitCheck
+      });
+    }
+
+    // Update last login timestamp
+    await cleanupService.updateLastLogin(req.user.id);
+
     const taskData = { ...req.body, user_id: req.user.id };
     const task = await TaskModel.create(taskData);
     res.status(201).json({
       message: 'Task created successfully',
-      task
+      task,
+      limit: limitCheck
     });
   } catch (error) {
     next(error);

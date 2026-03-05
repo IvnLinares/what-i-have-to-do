@@ -14,6 +14,7 @@ const pushRoutes = require('./src/routes/pushRoutes');
 const integrationRoutes = require('./src/routes/integrationRoutes');
 const errorHandler = require('./src/middleware/errorHandler');
 const reminderService = require('./src/services/reminderService');
+const cleanupService = require('./src/services/cleanupService');
 const syncService = require('./src/integrations/sync-service');
 
 const app = express();
@@ -58,6 +59,25 @@ app.use(errorHandler);
 const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
 });
+
+// Start cleanup service - runs every 12 hours
+console.log('📋 Starting data cleanup scheduler (every 12 hours)...');
+setInterval(async () => {
+  try {
+    await cleanupService.cleanupExpiredData();
+  } catch (error) {
+    console.error('Cleanup service error:', error);
+  }
+}, 12 * 60 * 60 * 1000); // 12 hours in milliseconds
+
+// Initial cleanup after 1 minute to ensure DB is connected
+setTimeout(async () => {
+  try {
+    await cleanupService.cleanupExpiredData();
+  } catch (error) {
+    console.error('Initial cleanup error:', error);
+  }
+}, 1 * 60 * 1000);
 
 // Graceful shutdown
 process.on('SIGINT', async () => {
