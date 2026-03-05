@@ -11,8 +11,10 @@ const authRoutes = require('./src/routes/authRoutes');
 const categoryRoutes = require('./src/routes/categoryRoutes');
 const tagRoutes = require('./src/routes/tagRoutes');
 const pushRoutes = require('./src/routes/pushRoutes');
+const integrationRoutes = require('./src/routes/integrationRoutes');
 const errorHandler = require('./src/middleware/errorHandler');
 const reminderService = require('./src/services/reminderService');
+const syncService = require('./src/integrations/sync-service');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -23,7 +25,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // Serve static files from the React/Vue frontend app
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
+// app.use(express.static(path.join(__dirname, '../frontend/dist')));
 
 // Start Reminder Service
 reminderService.start();
@@ -41,12 +43,13 @@ app.use('/api/tasks', taskRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/push', pushRoutes);
+app.use('/api/integrations', integrationRoutes);
 
 // The "catchall" handler: for any request that doesn't
 // match one above, send back React's index.html file.
-app.get(/.*/, (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
-});
+// app.get(/.*/, (req, res) => {
+//   res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
+// });
 
 // Error Handling
 app.use(errorHandler);

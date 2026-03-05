@@ -140,6 +140,24 @@ function initializeDatabase() {
            console.log("Adding parent_id column to tasks table...");
            db.run("ALTER TABLE tasks ADD COLUMN parent_id INTEGER REFERENCES tasks(id) ON DELETE CASCADE");
         }
+
+        const hasSyncedToICloud = rows.some(row => row.name === 'synced_to_icloud');
+        if (!hasSyncedToICloud) {
+           console.log("Adding synced_to_icloud column to tasks table...");
+           db.run("ALTER TABLE tasks ADD COLUMN synced_to_icloud BOOLEAN DEFAULT 0");
+        }
+
+        const hasSyncedToNotion = rows.some(row => row.name === 'synced_to_notion');
+        if (!hasSyncedToNotion) {
+           console.log("Adding synced_to_notion column to tasks table...");
+           db.run("ALTER TABLE tasks ADD COLUMN synced_to_notion BOOLEAN DEFAULT 0");
+        }
+
+        const hasSyncedToGoogle = rows.some(row => row.name === 'synced_to_google');
+        if (!hasSyncedToGoogle) {
+           console.log("Adding synced_to_google column to tasks table...");
+           db.run("ALTER TABLE tasks ADD COLUMN synced_to_google BOOLEAN DEFAULT 0");
+        }
       });
     }
   });
@@ -170,6 +188,55 @@ function initializeDatabase() {
   `, (err) => {
       if (err) console.error('Error creating task_dependencies table:', err.message);
       else console.log('Task_Dependencies table ready');
+  });
+
+  // Integrations Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS integrations (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_id INTEGER NOT NULL,
+      service TEXT NOT NULL,
+      access_token TEXT,
+      refresh_token TEXT,
+      settings TEXT,
+      last_sync DATETIME,
+      last_sync_status TEXT, -- 'success', 'error', 'pending'
+      connected BOOLEAN DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_id, service),
+      FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `, (err) => {
+      if (err) {
+          console.error('Error creating integrations table:', err.message);
+      } else {
+          console.log('Integrations table ready');
+          // Add column migration if missing
+          db.all("PRAGMA table_info(integrations)", [], (err, rows) => {
+              if (err) return;
+              const hasStatus = rows.some(r => r.name === 'last_sync_status');
+              if (!hasStatus) {
+                  console.log("Adding last_sync_status column to integrations...");
+                  db.run("ALTER TABLE integrations ADD COLUMN last_sync_status TEXT");
+              }
+          });
+      }
+  });
+
+  // Sync Logs Table
+  db.run(`
+    CREATE TABLE IF NOT EXISTS sync_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      integration_id INTEGER NOT NULL,
+      status TEXT NOT NULL,
+      details TEXT,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(integration_id) REFERENCES integrations(id) ON DELETE CASCADE
+    )
+  `, (err) => {
+      if (err) console.error('Error creating sync_logs table:', err.message);
+      else console.log('Sync_Logs table ready');
   });
 }
 

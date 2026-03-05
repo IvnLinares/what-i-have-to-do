@@ -140,31 +140,33 @@ const deleteCategory = async (id) => {
 .category-manager {
   margin-bottom: 2.5rem;
   background: rgba(120, 120, 128, 0.05);
-  padding: 1.5rem;
+  padding: 2rem;
   border-radius: 16px;
   border: 1px solid var(--glass-border);
 }
 
 .category-manager h3 {
   margin-top: 0;
-  margin-bottom: 1.25rem;
-  font-size: 1.2rem;
+  margin-bottom: 1.75rem;
+  font-size: 1.3rem;
   font-weight: 600;
   color: var(--text-color);
 }
 
 .add-form {
   display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.5rem;
-  align-items: stretch;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  align-items: center;
   flex-wrap: wrap;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
 .input-field {
   flex: 1;
-  min-width: 200px;
-  padding: 0.75rem 1rem;
+  min-width: 220px;
+  padding: 0.85rem 1.1rem;
   border-radius: var(--input-radius);
   border: 1px solid var(--glass-border);
   background: var(--glass-surface);
@@ -183,9 +185,9 @@ const deleteCategory = async (id) => {
 .color-picker-wrapper {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background: rgba(120, 120, 128, 0.05);
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: rgba(120, 120, 128, 0.03);
   border-radius: 12px;
   border: 1px solid var(--glass-border);
   flex-wrap: wrap;
@@ -257,10 +259,12 @@ const deleteCategory = async (id) => {
 .color-editor {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   flex-wrap: wrap;
   justify-content: flex-start;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.05);
 }
 
 .color-palette-inline {
@@ -342,9 +346,10 @@ const deleteCategory = async (id) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 1rem;
+  padding: 1.2rem;
   border-bottom: 1px solid var(--glass-border);
   transition: background 0.2s;
+  gap: 1rem;
 }
 
 .category-item:hover {
@@ -358,8 +363,9 @@ const deleteCategory = async (id) => {
 .category-info {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   flex: 1;
+  min-width: 0;
 }
 
 .color-dot {
@@ -391,7 +397,8 @@ const deleteCategory = async (id) => {
 
 .actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  flex-shrink: 0;
 }
 
 .btn-icon {

@@ -34,3 +34,10 @@ Thumbs.db
 # Temporary files
 tmp/
 temp/
+
+# Local scripts and test files
+start-dev.bat
+verify_*.js
+verify_*.py
+*configuration*.md
+*testing.md
