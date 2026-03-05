@@ -1,6 +1,7 @@
 import axios from 'axios'
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+// Supabase Edge Functions base URL
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://pemudfoinavlslhkgjlk.supabase.co/functions/v1'
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -21,67 +22,67 @@ apiClient.interceptors.request.use(config => {
 export default {
   // Auth API
   login(credentials) {
-    return apiClient.post('/api/auth/login', credentials)
+    return apiClient.post('/auth', { action: 'login', ...credentials })
   },
   register(credentials) {
-    return apiClient.post('/api/auth/register', credentials)
+    return apiClient.post('/auth', { action: 'register', ...credentials })
   },
   getMe() {
-    return apiClient.get('/api/auth/me')
+    return apiClient.get('/auth')
   },
 
   // Tasks API
   getTasks() {
-    return apiClient.get('/api/tasks')
+    return apiClient.get('/tasks')
   },
   
   getTask(id) {
-    return apiClient.get(`/api/tasks/${id}`)
+    return apiClient.get(`/tasks/${id}`)
   },
   
   createTask(task) {
-    return apiClient.post('/api/tasks', task)
+    return apiClient.post('/tasks', task)
   },
   
   updateTask(id, task) {
-    return apiClient.put(`/api/tasks/${id}`, task)
+    return apiClient.put(`/tasks/${id}`, task)
   },
   
   deleteTask(id) {
-    return apiClient.delete(`/api/tasks/${id}`)
+    return apiClient.delete(`/tasks/${id}`)
   },
 
   // Categories API
   getCategories() {
-    return apiClient.get('/api/categories')
+    return apiClient.get('/categories')
   },
 
   createCategory(category) {
-    return apiClient.post('/api/categories', category)
+    return apiClient.post('/categories', category)
   },
 
   updateCategory(id, category) {
-    return apiClient.put(`/api/categories/${id}`, category)
+    return apiClient.put(`/categories/${id}`, category)
   },
 
   deleteCategory(id) {
-    return apiClient.delete(`/api/categories/${id}`)
+    return apiClient.delete(`/categories/${id}`)
   },
 
   // Tags API
   getTags() {
-    return apiClient.get('/api/tags')
+    return apiClient.get('/tags')
   },
 
   createTag(tag) {
-    return apiClient.post('/api/tags', tag)
+    return apiClient.post('/tags', tag)
   },
 
   updateTag(id, tag) {
-    return apiClient.put(`/api/tags/${id}`, tag)
+    return apiClient.put(`/tags/${id}`, tag)
   },
 
   deleteTag(id) {
-    return apiClient.delete(`/api/tags/${id}`)
+    return apiClient.delete(`/tags/${id}`)
   }
 }
