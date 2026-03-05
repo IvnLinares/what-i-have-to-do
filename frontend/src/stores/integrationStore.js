@@ -24,8 +24,6 @@ export const useIntegrationStore = defineStore('integration', {
     async disconnect(service) {
       // Integrations not available in this version
       return
-n    }
-      }
     },
 
     async syncAll() {
