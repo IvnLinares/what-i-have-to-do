@@ -1,7 +1,7 @@
 <template>
   <div class="auth-container">
     <div class="auth-card glass-panel">
-      
+
       <div class="auth-header">
         <div class="brand-icon">
           <font-awesome-icon icon="fa-solid fa-rocket" />
@@ -12,34 +12,31 @@
 
       <form @submit.prevent="handleSubmit" class="auth-form">
         <div class="form-group">
-          <label for="username">Usuario</label>
+          <label for="email">Email</label>
           <div class="input-wrapper">
             <font-awesome-icon icon="fa-solid fa-user" class="input-icon" />
-            <input
-              v-model="form.username"
-              type="text"
-              id="username"
-              placeholder="Tu nombre de usuario"
-              required
-              minlength="3"
-              class="input-field"
-            />
+            <input v-model="form.email" type="email" id="email" placeholder="tu@email.com" required
+              class="input-field" />
           </div>
         </div>
-        
+
+        <transition name="fade">
+          <div v-if="!isLogin" class="form-group">
+            <label for="username">Nombre de usuario</label>
+            <div class="input-wrapper">
+              <font-awesome-icon icon="fa-solid fa-font" class="input-icon" />
+              <input v-model="form.username" type="text" id="username" placeholder="Como te verán otros"
+                :required="!isLogin" minlength="3" class="input-field" />
+            </div>
+          </div>
+        </transition>
+
         <div class="form-group">
           <label for="password">Contraseña</label>
           <div class="input-wrapper">
             <font-awesome-icon icon="fa-solid fa-lock" class="input-icon" />
-            <input
-              v-model="form.password"
-              type="password"
-              id="password"
-              placeholder="Tu contraseña"
-              required
-              minlength="6"
-              class="input-field"
-            />
+            <input v-model="form.password" type="password" id="password" placeholder="Tu contraseña" required
+              minlength="6" class="input-field" />
           </div>
         </div>
 
@@ -78,22 +75,22 @@ const authStore = useAuthStore()
 const router = useRouter()
 
 const isLogin = ref(true)
-const form = ref({ username: '', password: '' })
+const form = ref({ email: '', password: '', username: '' })
 
 const toggleMode = () => {
   isLogin.value = !isLogin.value
   authStore.error = null
-  form.value = { username: '', password: '' }
+  form.value = { email: '', password: '', username: '' }
 }
 
 const handleSubmit = async () => {
-  const { username, password } = form.value
+  const { email, password, username } = form.value
   let success
 
   if (isLogin.value) {
-    success = await authStore.login(username, password)
+    success = await authStore.login(email, password)
   } else {
-    success = await authStore.register(username, password)
+    success = await authStore.register(email, password, username)
   }
 
   if (success) {
@@ -190,7 +187,8 @@ label {
 
 .input-field {
   width: 100%;
-  padding: 14px 16px 14px 44px; /* Make room for icon */
+  padding: 14px 16px 14px 44px;
+  /* Make room for icon */
   border-radius: 14px;
   background: var(--surface-color);
   border: 1px solid var(--border-color);

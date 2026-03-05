@@ -33,6 +33,13 @@ library.add(
 
 const app = createApp(App)
 app.component('font-awesome-icon', FontAwesomeIcon)
-app.use(createPinia())
+const pinia = createPinia()
+app.use(pinia)
 app.use(router)
+
+// Initialize auth
+import { useAuthStore } from './stores/authStore'
+const authStore = useAuthStore(pinia)
+authStore.checkAuth()
+
 app.mount('#app')

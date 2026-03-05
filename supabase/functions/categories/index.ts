@@ -12,39 +12,19 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 )
 
-function getAuthUser(req: Request): any {
-  const auth = req.headers.get("authorization")
-  if (!auth) {
-    console.error("No authorization header")
+async function getAuthUser(req: Request): Promise<string | null> {
+  const authHeader = req.headers.get("Authorization")
+  if (!authHeader) return null
+
+  const token = authHeader.replace("Bearer ", "")
+  const { data: { user }, error } = await supabase.auth.getUser(token)
+
+  if (error || !user) {
+    console.error("Auth error:", error)
     return null
   }
-  
-  try {
-    const token = auth.replace("Bearer ", "").trim()
-    if (!token) {
-      console.error("Empty token")
-      return null
-    }
 
-    const tokenParts = token.split(".")
-    let base64String = tokenParts.length === 3 ? tokenParts[1] : token
-
-    base64String = base64String.replace(/-/g, "+").replace(/_/g, "/")
-    while (base64String.length % 4) {
-      base64String += "="
-    }
-
-    const payload = JSON.parse(atob(base64String))
-    const userId = payload.user_id || payload.sub
-    if (!userId) {
-      console.error("No user_id in token")
-      return null
-    }
-    return userId
-  } catch (e) {
-    console.error("Token parse error:", e.message)
-    return null
-  }
+  return user.id
 }
 
 serve(async (req) => {
@@ -53,9 +33,8 @@ serve(async (req) => {
   }
 
   try {
-    const userId = getAuthUser(req)
+    const userId = await getAuthUser(req)
     if (!userId) {
-      console.error("Auth failed: userId is null")
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }

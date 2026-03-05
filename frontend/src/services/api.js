@@ -10,23 +10,21 @@ const apiClient = axios.create({
   }
 })
 
-// Add interceptor to include token
-apiClient.interceptors.request.use(config => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`
+// Add interceptor to include token from Supabase session
+apiClient.interceptors.request.use(async config => {
+  // We'll import supabase dynamically to avoid circular dependencies if any
+  const { supabase } = await import('./supabase')
+  const { data: { session } } = await supabase.auth.getSession()
+  
+  if (session?.access_token) {
+    config.headers.Authorization = `Bearer ${session.access_token}`
   }
   return config
 })
 
 export default {
   // Auth API
-  login(credentials) {
-    return apiClient.post('/auth', { action: 'login', ...credentials })
-  },
-  register(credentials) {
-    return apiClient.post('/auth', { action: 'register', ...credentials })
-  },
+  // Handled by supabase-js directly now
   getMe() {
     return apiClient.get('/auth')
   },

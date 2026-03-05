@@ -25,15 +25,6 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
-  // Verify token validity if it exists but user is null
-  if (authStore.token && !authStore.user) {
-    try {
-      await authStore.checkAuth()
-    } catch (e) {
-      // Token invalid
-    }
-  }
-
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {
     next('/login')
   } else if (to.path === '/login' && authStore.isAuthenticated) {

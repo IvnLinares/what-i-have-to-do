@@ -1,61 +1,78 @@
 import { defineStore } from 'pinia'
-import api from '../services/api'
+import { supabase } from '../services/supabase'
 
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     user: null,
-    token: localStorage.getItem('token') || null,
+    session: null,
     loading: false,
     error: null
   }),
   getters: {
-    isAuthenticated: (state) => !!state.token
+    isAuthenticated: (state) => !!state.session,
+    userId: (state) => state.session?.user?.id
   },
   actions: {
-    async login(username, password) {
+    async login(email, password) {
       this.loading = true
       this.error = null
       try {
-        const response = await api.login({ username, password })
-        this.token = response.data.token
-        this.user = response.data.user
-        localStorage.setItem('token', this.token)
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+        if (error) throw error
+        this.session = data.session
+        this.user = data.user
         return true
       } catch (err) {
-        this.error = err.response?.data?.error || 'Login failed'
+        this.error = err.message || 'Login failed'
         return false
       } finally {
         this.loading = false
       }
     },
-    async register(username, password) {
+    async register(email, password, username) {
       this.loading = true
       this.error = null
       try {
-        const response = await api.register({ username, password })
-        this.token = response.data.token
-        this.user = response.data.user
-        localStorage.setItem('token', this.token)
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            data: {
+              username: username
+            }
+          }
+        })
+        if (error) throw error
+        this.session = data.session
+        this.user = data.user
         return true
       } catch (err) {
-        this.error = err.response?.data?.error || 'Registration failed'
+        this.error = err.message || 'Registration failed'
         return false
       } finally {
         this.loading = false
       }
     },
-    logout() {
-      this.token = null
+    async logout() {
+      await supabase.auth.signOut()
+      this.session = null
       this.user = null
-      localStorage.removeItem('token')
     },
     async checkAuth() {
-        if (!this.token) return
-        try {
-            const response = await api.getMe()
-            this.user = response.data.user
-        } catch (err) {
-            this.logout()
+        const { data: { session } } = await supabase.auth.getSession()
+        this.session = session
+        this.user = session?.user || null
+        
+        // Listen for auth changes only if not already listening
+        if (!this.authListener) {
+          const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            this.session = session
+            this.user = session?.user || null
+          })
+          this.authListener = subscription
         }
     }
   }
