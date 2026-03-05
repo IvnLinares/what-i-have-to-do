@@ -15,9 +15,14 @@ const supabase = createClient(
 function getAuthUser(req: Request) {
   const auth = req.headers.get("authorization")
   if (!auth) return null
-  const token = auth.replace("Bearer ", "")
-  const payload = JSON.parse(atob(token.split(".")[1]))
-  return payload.user_id || payload.sub
+  
+  try {
+    const token = auth.replace("Bearer ", "")
+    const payload = JSON.parse(atob(token))
+    return payload.user_id || payload.sub
+  } catch (e) {
+    return null
+  }
 }
 
 serve(async (req) => {
