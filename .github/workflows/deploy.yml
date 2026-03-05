@@ -50,4 +50,4 @@ jobs:
       - name: Print deployment URL
         run: |
           echo "✅ Deployment successful!"
-          echo "🌐 Demo available at: https://ivnlinares.github.io/Copilot-Testing/"
+          echo "🌐 Demo available at: https://ivnlinares.github.io/what-i-have-to-do/"

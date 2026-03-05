@@ -5,7 +5,7 @@ import fs from 'fs'
 import path from 'path'
 
 export default defineConfig({
-  base: '/Copilot-Testing/',
+  base: '/what-i-have-to-do/',
   plugins: [
     vue(),
     VitePWA({
@@ -16,8 +16,8 @@ export default defineConfig({
       },
       includeAssets: ['favicon.ico'],
       manifest: {
-        name: 'Copilot Task Manager',
-        short_name: 'Copilot Tasks',
+        name: 'What I Have To Do',
+        short_name: 'ToDo',
         description: 'Gestor de tareas inteligente con PWA',
         theme_color: '#6366f1',
         background_color: '#f8fafc',
@@ -42,14 +42,14 @@ export default defineConfig({
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Redirigiendo...</title>
     <script>
-      const path = location.pathname.replace(/^\\/Copilot-Testing/, '') || '/';
+      const path = location.pathname.replace(/^\\/what-i-have-to-do/, '') || '/';
       sessionStorage.redirect = path;
-      location.href = '/Copilot-Testing/';
+      location.href = '/what-i-have-to-do/';
     </script>
   </head>
   <body>
     <h1>Redirigiendo...</h1>
-    <p>Si no eres redirigido en unos segundos, por favor <a href="/Copilot-Testing/">haz clic aquí</a>.</p>
+    <p>Si no eres redirigido en unos segundos, por favor <a href="/what-i-have-to-do/">haz clic aquí</a>.</p>
   </body>
 </html>`
         fs.writeFileSync(notFoundPath, notFoundContent)

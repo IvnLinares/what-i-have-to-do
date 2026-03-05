@@ -4,7 +4,7 @@ Esta aplicación está desplegada en **GitHub Pages** y lista para ser explorada
 
 ## 📍 Acceder al Demo
 
-🌐 **URL:** [https://ivnlinares.github.io/Copilot-Testing/](https://ivnlinares.github.io/Copilot-Testing/)
+🌐 **URL:** [https://ivnlinares.github.io/what-i-have-to-do/](https://ivnlinares.github.io/what-i-have-to-do/)
 
 ## ⚙️ Configuración del Backend para Demo
 
@@ -16,8 +16,8 @@ Si estás desarrollando localmente, sigue estos pasos:
 
 1. **Clona el repositorio:**
    ```bash
-   git clone https://github.com/IvnLinares/Copilot-Testing.git
-   cd Copilot-Testing
+   git clone https://github.com/IvnLinares/what-i-have-to-do.git
+   cd what-i-have-to-do
    ```
 
 2. **Instala dependencias del backend:**
@@ -117,7 +117,7 @@ NOTION_API_KEY=tu_notion_key
 
 En cualquier navegador moderno:
 
-1. Ve a https://ivnlinares.github.io/Copilot-Testing/
+1. Ve a https://ivnlinares.github.io/what-i-have-to-do/
 2. Haz clic en el botón "Instalar" (esquina superior derecha)
 3. ¡Disfruta la aplicación como una app nativa!
 
@@ -146,7 +146,7 @@ En cualquier navegador moderno:
 ## 🤝 Contribuir
 
 ¿Encontraste un bug o tienes una idea? 
-[Abre un issue en GitHub](https://github.com/IvnLinares/Copilot-Testing/issues)
+[Abre un issue en GitHub](https://github.com/IvnLinares/what-i-have-to-do/issues)
 
 ## 📄 Licencia
 

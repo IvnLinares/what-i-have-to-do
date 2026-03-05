@@ -1,6 +1,6 @@
-# 🚀 Copilot-Testing Sandbox
+# 🚀 What I Have To Do?
 
-Proyecto desarrollado para el testing y exploración de GitHub Copilot Agent Mode
+Aplicación de gestión de tareas con sincronización de calendarios integrada
 
 ---
 
@@ -8,7 +8,7 @@ Proyecto desarrollado para el testing y exploración de GitHub Copilot Agent Mod
 
 > ✨ **¿Quieres ver la aplicación en acción?**
 >
-> 👉 **[Accede al demo en GitHub Pages](https://ivnlinares.github.io/Copilot-Testing/)**
+> 👉 **[Accede al demo en GitHub Pages](https://ivnlinares.github.io/what-i-have-to-do/)**
 >
 > Para más detalles sobre cómo usar el demo, lee [📌 DEMO.md](./DEMO.md)
 
@@ -16,27 +16,27 @@ Proyecto desarrollado para el testing y exploración de GitHub Copilot Agent Mod
 
 ## 📋 Descripción
 
-Este es un proyecto sandbox completo diseñado para practicar, aprender y explorar todas las funcionalidades de GitHub Copilot en modo agente. Incluye un stack web moderno con:
+Esta es una aplicación completa de gestión de tareas diseñada para mejorar tu productividad. Incluye un stack web moderno con:
 
 - **Frontend**: Vue 3 + Vite
 - **Backend**: Express.js
-- **Base de Datos**: SQLite
+- **Base de Datos**: Supabase (PostgreSQL)
 
 ## 🎯 Objetivo
 
-Proporcionar un entorno de desarrollo web completo donde puedas:
+Proporcionar una herramienta de productividad completa donde puedas:
 
-- ✨ Experimentar con todas las capacidades de Copilot
-- 🧪 Probar diferentes patrones y prácticas de código
-- 📚 Aprender desarrollo web potenciado por IA
-- 🔧 Implementar nuevas funcionalidades con ayuda de Copilot
-- 🎨 Mejorar tus habilidades de programación
+- ✨ Organizar y gestionar tus tareas diarias
+- 🧪 Sincronizar con múltiples calendarios (Google, iCloud, Notion)
+- 📚 Crear categorías y etiquetas personalizadas
+- 🔧 Recibir recordatorios y notificaciones
+- 🎨 Mejorar tu experiencia de productividad
 
 ## 🏗️ Estructura del Proyecto
 
 ```
-Copilot-Testing/
-├── backend/           # API REST con Express y SQLite
+What-I-Have-To-Do/
+├── backend/           # API REST con Express y Supabase
 │   ├── server.js     # Servidor principal
 │   ├── package.json  # Dependencias del backend
 │   └── .env.example  # Variables de entorno ejemplo
@@ -64,8 +64,8 @@ Copilot-Testing/
 
 1. **Clonar el repositorio**
    ```bash
-   git clone https://github.com/IvnLinares/Copilot-Testing.git
-   cd Copilot-Testing
+   git clone https://github.com/IvnLinares/what-i-have-to-do.git
+   cd what-i-have-to-do
    ```
 
 2. **Instalar dependencias del backend**

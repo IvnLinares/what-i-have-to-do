@@ -2,7 +2,7 @@
 
 ## Project Information
 
-**Project Name:** copilot-testing-backend  
+**Project Name:** what-i-have-to-do-backend  
 **Project ID:** pemudfoinavlslhkgjlk  
 **Region:** US East 1  
 **Status:** ✅ Active & Healthy

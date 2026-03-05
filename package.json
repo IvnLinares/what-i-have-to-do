@@ -1,7 +1,7 @@
 {
-  "name": "copilot-testing-sandbox",
+  "name": "what-i-have-to-do",
   "version": "1.0.0",
-  "description": "Sandbox project for testing GitHub Copilot with Vue, Express, and SQLite",
+  "description": "Task management application with Vue, Express, and Supabase",
   "scripts": {
     "install:all": "cd backend && npm install && cd ../frontend && npm install",
     "dev:backend": "cd backend && npm run dev",
@@ -10,12 +10,12 @@
     "build:frontend": "cd frontend && npm run build"
   },
   "keywords": [
-    "copilot",
+    "task-manager",
     "vue",
     "express",
-    "sqlite",
-    "sandbox",
-    "learning"
+    "supabase",
+    "productivity",
+    "calendar"
   ],
   "author": "",
   "license": "ISC"

@@ -179,7 +179,7 @@ curl -X POST https://pemudfoinavlslhkgjlk.supabase.co/functions/v1/tasks \
 
 ### 3. Frontend Live Demo
 
-**URL:** https://ivnlinares.github.io/Copilot-Testing/
+**URL:** https://ivnlinares.github.io/what-i-have-to-do/
 
 **Test User:**
 - Username: `linaresivn@gmail.com`
@@ -286,7 +286,7 @@ frontend/
 | Project ID | `pemudfoinavlslhkgjlk` |
 | Database Host | `db.pemudfoinavlslhkgjlk.supabase.co` |
 | Functions Base URL | `https://pemudfoinavlslhkgjlk.supabase.co/functions/v1` |
-| Frontend URL | `https://ivnlinares.github.io/Copilot-Testing/` |
+| Frontend URL | `https://ivnlinares.github.io/what-i-have-to-do/` |
 | Test User | `linaresivn@gmail.com` / `admin123` |
 | Region | us-east-1 |
 | Runtime | Deno (TypeScript) |

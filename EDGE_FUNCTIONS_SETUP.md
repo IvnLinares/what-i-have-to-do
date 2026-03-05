@@ -35,7 +35,7 @@ Supabase PostgreSQL
 
 1. Ve a: https://supabase.com/dashboard/project/pemudfoinavlslhkgjlk/settings/integrations
 2. Click "GitHub"
-3. Autoriza Supabase para acceder a `IvnLinares/Copilot-Testing`
+3. Autoriza Supabase para acceder a `IvnLinares/what-i-have-to-do`
 4. Selecciona que carpeta monitorear: `supabase/functions`
 
 ### PASO 2: Deploy Automático
@@ -179,7 +179,7 @@ curl -X POST https://pemudfoinavlslhkgjlk.supabase.co/functions/v1/auth \
 
 ### Test 3: Desde el Frontend
 
-1. Abre: https://ivnlinares.github.io/Copilot-Testing/
+1. Abre: https://ivnlinares.github.io/what-i-have-to-do/
 2. Intenta login con linaresivn@gmail.com / admin123
 3. Verifica en browser DevTools (F12) los requests
 
@@ -256,7 +256,7 @@ En Supabase Dashboard:
 - [ ] Conectado GitHub a Supabase
 - [ ] Funciones deployed en Supabase
 - [ ] Frontend actualizado con nueva API_URL
-- [ ] Login funciona en https://ivnlinares.github.io/Copilot-Testing/
+- [ ] Login funciona en https://ivnlinares.github.io/what-i-have-to-do/
 - [ ] Tareas se crean/leen correctamente
 - [ ] Datos persistidos en PostgreSQL
 

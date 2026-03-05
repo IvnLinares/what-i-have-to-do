@@ -25,7 +25,7 @@ Guía para desplegar el backend Express.js a **Railway** (el servicio más fáci
 
 1. En Railway dashboard, click "New Project"
 2. Selecciona "Deploy from GitHub repo"
-3. Busca y selecciona: `IvnLinares/Copilot-Testing`
+3. Busca y selecciona: `IvnLinares/what-i-have-to-do`
 4. Click "Deploy Now"
 
 ### Step 3: Configurar Servicio Backend
@@ -132,7 +132,7 @@ curl https://your-service-xxxxx.railway.app/api
 
 # Deberías ver:
 # {
-#   "message": "Welcome to Copilot Testing API",
+#   "message": "Welcome to What I Have To Do API",
 #   "version": "2.0.0"
 # }
 ```
@@ -152,7 +152,7 @@ curl -X POST https://your-service-xxxxx.railway.app/api/auth/login \
 
 ### Test 3: Frontend conecta
 
-1. Abre: https://ivnlinares.github.io/Copilot-Testing/
+1. Abre: https://ivnlinares.github.io/what-i-have-to-do/
 2. Intenta login con: `linaresivn@gmail.com` / `admin123`
 3. Deberías ver las tareas (o lista vacía)
 
@@ -208,7 +208,7 @@ SELECT * FROM data_retention_logs ORDER BY created_at DESC;
 
 ### Frontend Errors
 
-Abre: https://ivnlinares.github.io/Copilot-Testing/  
+Abre: https://ivnlinares.github.io/what-i-have-to-do/  
 Presiona F12 → Console → Verifica errores de conexión
 
 ---
@@ -249,7 +249,7 @@ Railway detecta automáticamente cambios en GitHub:
 - [ ] Variables de entorno configuradas
 - [ ] Backend URL obtenida
 - [ ] Frontend apunta a backend URL
-- [ ] Login funciona en https://ivnlinares.github.io/Copilot-Testing/
+- [ ] Login funciona en https://ivnlinares.github.io/what-i-have-to-do/
 - [ ] Tareas se crean y leen correctamente
 - [ ] Datos se persisten en Supabase
 
@@ -259,8 +259,8 @@ Railway detecta automáticamente cambios en GitHub:
 
 - **Railway Dashboard:** https://railway.app/dashboard
 - **Supabase Dashboard:** https://supabase.com/dashboard/project/pemudfoinavlslhkgjlk
-- **GitHub Actions:** https://github.com/IvnLinares/Copilot-Testing/actions
-- **Frontend Demo:** https://ivnlinares.github.io/Copilot-Testing/
+- **GitHub Actions:** https://github.com/IvnLinares/what-i-have-to-do/actions
+- **Frontend Demo:** https://ivnlinares.github.io/what-i-have-to-do/
 
 ---
 

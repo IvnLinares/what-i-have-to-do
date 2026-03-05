@@ -4,8 +4,8 @@
 
 ### 1️⃣ Clonar el repositorio
 ```bash
-git clone https://github.com/IvnLinares/Copilot-Testing.git
-cd Copilot-Testing
+git clone https://github.com/IvnLinares/what-i-have-to-do.git
+cd what-i-have-to-do
 ```
 
 ### 2️⃣ Instalar dependencias
@@ -105,7 +105,7 @@ Abre cualquier archivo y comienza a escribir comentarios sobre lo que quieres ha
 ## 📚 Estructura de Archivos Clave
 
 ```
-Copilot-Testing/
+What-I-Have-To-Do/
 ├── backend/
 │   └── server.js          ← Aquí está toda la lógica del API
 ├── frontend/
