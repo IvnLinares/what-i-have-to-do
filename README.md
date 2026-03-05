@@ -80,6 +80,31 @@ Copilot-Testing/
    npm install
    ```
 
+### Configuración de Base de Datos
+
+Tienes dos opciones para la base de datos:
+
+#### Opción 1: SQLite Local (Desarrollo Rápido) ⭐
+```bash
+# Usa la configuración por defecto
+# La BD se crea automáticamente en backend/database.sqlite
+cd backend
+npm run dev
+```
+
+#### Opción 2: Supabase en la Nube (Producción)
+```bash
+# Lee la guía completa:
+# 📖 SUPABASE_SETUP.md
+
+# Resumen:
+1. Configurar variables de entorno en backend/.env
+2. npm install pg
+3. Actualizar src/config/db.js con conexión PostgreSQL
+```
+
+Ver [SUPABASE_SETUP.md](./SUPABASE_SETUP.md) para instrucciones detalladas.
+
 ### Ejecución en Desarrollo
 
 1. **Iniciar el backend**
