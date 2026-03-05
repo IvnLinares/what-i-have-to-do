@@ -94,6 +94,35 @@ serve(async (req) => {
   }
 
   try {
+    if (req.method === "GET") {
+      const authHeader = req.headers.get("authorization")
+      if (!authHeader) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } })
+      }
+      
+      try {
+        const token = authHeader.replace("Bearer ", "").trim()
+        const tokenParts = token.split(".")
+        let base64String = tokenParts.length === 3 ? tokenParts[1] : token
+        
+        base64String = base64String.replace(/-/g, "+").replace(/_/g, "/")
+        while (base64String.length % 4) {
+          base64String += "="
+        }
+        
+        const payload = JSON.parse(atob(base64String))
+        const userId = payload.user_id || payload.sub
+        
+        if (userId) {
+          return new Response(JSON.stringify({ user: { id: userId, username: payload.username || "User" } }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } })
+        } else {
+          throw new Error("Invalid token payload")
+        }
+      } catch (e) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } })
+      }
+    }
+
     const { action, username, password } = await req.json()
 
     let result
