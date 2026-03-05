@@ -12,7 +12,7 @@
 
       <form @submit.prevent="handleSubmit" class="auth-form">
         <div class="form-group">
-          <label for="email">Email</label>
+          <label for="email">Email <span class="required-star">*</span></label>
           <div class="input-wrapper">
             <font-awesome-icon icon="fa-solid fa-user" class="input-icon" />
             <input v-model="form.email" type="email" id="email" placeholder="tu@email.com" required
@@ -22,7 +22,7 @@
 
         <transition name="fade">
           <div v-if="!isLogin" class="form-group">
-            <label for="username">Nombre de usuario</label>
+            <label for="username">Nombre de usuario <span class="required-star">*</span></label>
             <div class="input-wrapper">
               <font-awesome-icon icon="fa-solid fa-font" class="input-icon" />
               <input v-model="form.username" type="text" id="username" placeholder="Como te verán otros"
@@ -32,7 +32,7 @@
         </transition>
 
         <div class="form-group">
-          <label for="password">Contraseña</label>
+          <label for="password">Contraseña <span class="required-star">*</span></label>
           <div class="input-wrapper">
             <font-awesome-icon icon="fa-solid fa-lock" class="input-icon" />
             <input v-model="form.password" type="password" id="password" placeholder="Tu contraseña" required
@@ -85,11 +85,21 @@ const toggleMode = () => {
 
 const handleSubmit = async () => {
   const { email, password, username } = form.value
-  let success
 
+  // Basic JS validation to ensure email is present and looks like an email
+  if (!email || !email.includes('@')) {
+    authStore.error = 'Se requiere un correo electrónico válido'
+    return
+  }
+
+  let success
   if (isLogin.value) {
     success = await authStore.login(email, password)
   } else {
+    if (!username || username.length < 3) {
+      authStore.error = 'El nombre de usuario debe tener al menos 3 caracteres'
+      return
+    }
     success = await authStore.register(email, password, username)
   }
 
@@ -166,6 +176,11 @@ label {
   font-weight: 600;
   color: var(--text-color);
   margin-left: 0.25rem;
+}
+
+.required-star {
+  color: var(--danger-color);
+  margin-left: 2px;
 }
 
 /* Input Wrappers for Icons */
