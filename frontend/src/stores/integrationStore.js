@@ -10,44 +10,21 @@ export const useIntegrationStore = defineStore('integration', {
 
   actions: {
     async fetchIntegrations() {
-      this.loading = true
-      this.error = null
-      try {
-        const response = await api.get('/integrations')
-        this.integrations = response.data
-      } catch (err) {
-        this.error = err.response?.data?.error || 'Error fetching integrations'
-        console.error(err)
-      } finally {
-        this.loading = false
-      }
+      // Integrations not available in this version
+      this.loading = false
+      this.integrations = []
+      return
     },
 
     async connectIcloud(credentials) {
-      this.loading = true
-      this.error = null
-      try {
-        await api.post('/integrations/connect/icloud', credentials)
-        await this.fetchIntegrations()
-        return true
-      } catch (err) {
-        this.error = err.response?.data?.error || 'Error connecting iCloud'
-        return false
-      } finally {
-        this.loading = false
-      }
+      // Integrations not available in this version
+      return false
     },
 
     async disconnect(service) {
-      this.loading = true
-      this.error = null
-      try {
-        await api.delete(`/integrations/${service}`)
-        await this.fetchIntegrations()
-      } catch (err) {
-        this.error = err.response?.data?.error || 'Error disconnecting service'
-      } finally {
-        this.loading = false
+      // Integrations not available in this version
+      return
+n    }
       }
     },
 

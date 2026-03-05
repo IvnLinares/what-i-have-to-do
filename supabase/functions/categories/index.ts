@@ -12,15 +12,28 @@ const supabase = createClient(
   Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
 )
 
-function getAuthUser(req: Request) {
+function getAuthUser(req: Request): number | null {
   const auth = req.headers.get("authorization")
-  if (!auth) return null
+  if (!auth) {
+    console.error("No authorization header")
+    return null
+  }
   
   try {
     const token = auth.replace("Bearer ", "")
+    if (!token) {
+      console.error("Empty token")
+      return null
+    }
     const payload = JSON.parse(atob(token))
-    return payload.user_id || payload.sub
+    const userId = payload.user_id || payload.sub
+    if (!userId) {
+      console.error("No user_id in token")
+      return null
+    }
+    return userId
   } catch (e) {
+    console.error("Token parse error:", e.message)
     return null
   }
 }
