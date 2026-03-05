@@ -2,6 +2,18 @@
 
 Proyecto desarrollado para el testing y exploración de GitHub Copilot Agent Mode
 
+---
+
+## 🌐 Demo en Vivo
+
+> ✨ **¿Quieres ver la aplicación en acción?**
+>
+> 👉 **[Accede al demo en GitHub Pages](https://ivnlinares.github.io/Copilot-Testing/)**
+>
+> Para más detalles sobre cómo usar el demo, lee [📌 DEMO.md](./DEMO.md)
+
+---
+
 ## 📋 Descripción
 
 Este es un proyecto sandbox completo diseñado para practicar, aprender y explorar todas las funcionalidades de GitHub Copilot en modo agente. Incluye un stack web moderno con:

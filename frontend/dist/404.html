@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/Copilot-Testing/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Copilot Task Manager - Redirecting...</title>
+    <script>
+      // SPA redirect for GitHub Pages
+      const path = location.pathname.replace(/^\/Copilot-Testing/, '') || '/';
+      sessionStorage.redirect = path;
+      location.href = '/Copilot-Testing/';
+    </script>
+  </head>
+  <body>
+    <h1>Redirecting...</h1>
+    <p>If you are not redirected in a few seconds, please <a href="/Copilot-Testing/">click here</a>.</p>
+  </body>
+</html>

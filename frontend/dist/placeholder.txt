@@ -3,7 +3,6 @@ import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/Copilot-Testing/',
   plugins: [
     vue(),
     VitePWA({
@@ -47,19 +46,6 @@ export default defineConfig({
       }
     })
   ],
-  build: {
-    outDir: 'dist',
-    assetsDir: 'assets',
-    minify: 'terser',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          'vendor': ['vue', 'axios'],
-          'ui': ['pinia']
-        }
-      }
-    }
-  },
   server: {
     port: 5173,
     proxy: {
