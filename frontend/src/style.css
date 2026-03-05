@@ -1,16 +1,18 @@
 :root {
   /* --- Apple-inspired Palette --- */
-  --primary-color: #007AFF; /* iOS Blue */
+  --primary-color: #007aff; /* iOS Blue */
   --primary-hover: #0063ce;
-  --secondary-color: #8E8E93; /* iOS Gray */
+  --secondary-color: #8e8e93; /* iOS Gray */
 
-  --success-color: #34C759; /* iOS Green */
-  --warning-color: #FF9500; /* iOS Orange */
-  --danger-color: #FF3B30;  /* iOS Red */
+  --success-color: #34c759; /* iOS Green */
+  --warning-color: #ff9500; /* iOS Orange */
+  --danger-color: #ff3b30; /* iOS Red */
 
   /* --- Typography --- */
   /* SF Pro stack is prioritized */
-  --font-stack: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-stack:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
 
   /* --- Light Theme Variables --- */
   --text-color: #1c1c1e; /* iOS Dark Gray Text */
@@ -18,23 +20,23 @@
 
   /* Mesh Gradient Background (Light) */
   --bg-image:
-    radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%),
-    radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%),
-    radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+    radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
   --bg-color: #f2f2f7; /* iOS System Gray 6 */
 
   /* Liquid Glass Surface (Light) */
   --glass-surface: rgba(255, 255, 255, 0.65);
   --glass-border: rgba(255, 255, 255, 0.4);
   --glass-blur: 25px;
-  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.10);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
 
   /* Border colors */
   --border-color: rgba(0, 0, 0, 0.1);
   --surface-color: rgba(255, 255, 255, 0.5);
 
   /* Squircles & Spacing */
-  --card-radius: 24px;  /* Prominent squircle-like radius */
+  --card-radius: 24px; /* Prominent squircle-like radius */
   --btn-radius: 14px;
   --input-radius: 12px;
 
@@ -43,10 +45,15 @@
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* Force color-scheme for native UI elements (like select dropdowns) */
+  color-scheme: light;
 }
 
 /* --- Dark Theme --- */
-.dark-theme {
+.dark-theme,
+[data-theme="dark"] {
+  color-scheme: dark;
   --text-color: #ffffff;
   --text-muted: #98989d;
 
@@ -57,14 +64,14 @@
     radial-gradient(at 80% 0%, hsla(230, 60%, 25%, 1) 0px, transparent 50%),
     radial-gradient(at 0% 50%, hsla(340, 60%, 20%, 1) 0px, transparent 50%);
 
-  --glass-surface: rgba(30, 30, 30, 0.60);
+  --glass-surface: rgba(30, 30, 30, 0.6);
   --glass-border: rgba(255, 255, 255, 0.1);
   --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
 
   --border-color: rgba(255, 255, 255, 0.1);
   --surface-color: rgba(255, 255, 255, 0.05);
 
-  --primary-color: #0A84FF; /* iOS Dark Mode Blue */
+  --primary-color: #0a84ff; /* iOS Dark Mode Blue */
 }
 
 /* --- Global Reset & Base --- */
@@ -78,12 +85,22 @@ body {
   background-color: var(--bg-color);
   /* Apply Mesh Gradient */
   background-image:
-    radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.15), transparent 25%),
-    radial-gradient(circle at 85% 30%, rgba(236, 72, 153, 0.15), transparent 25%);
+    radial-gradient(
+      circle at 15% 50%,
+      rgba(99, 102, 241, 0.15),
+      transparent 25%
+    ),
+    radial-gradient(
+      circle at 85% 30%,
+      rgba(236, 72, 153, 0.15),
+      transparent 25%
+    );
   background-attachment: fixed;
   color: var(--text-color);
   min-height: 100vh;
-  transition: background 0.5s ease, color 0.3s ease;
+  transition:
+    background 0.5s ease,
+    color 0.3s ease;
 }
 
 #app {
@@ -93,7 +110,12 @@ body {
 }
 
 /* --- Typography Helpers --- */
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   letter-spacing: -0.02em; /* Tight tracking like Apple */
   margin-bottom: 0.6em;
 }
@@ -104,24 +126,29 @@ button {
 }
 
 /* --- Glassmorphism Utilities --- */
-.card, .glass-panel {
+.card,
+.glass-panel {
   background: var(--glass-surface);
   backdrop-filter: blur(var(--glass-blur));
   -webkit-backdrop-filter: blur(var(--glass-blur)); /* Safari support */
   border: 1px solid var(--glass-border);
   box-shadow: var(--glass-shadow);
   border-radius: var(--card-radius);
-  transition: transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s;
+  transition:
+    transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.2s;
 }
 
 /* Hover Lift Effect */
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
 /* --- Inputs (iOS Style) --- */
-input, textarea, select {
+input,
+textarea,
+select {
   font-family: inherit;
   border-radius: var(--input-radius);
   border: 1px solid transparent; /* No border by default */
@@ -132,10 +159,35 @@ input, textarea, select {
   transition: all 0.2s ease;
 }
 
-input:focus, textarea:focus, select:focus {
+input:focus,
+textarea:focus,
+select:focus {
   outline: none;
   background: rgba(120, 120, 128, 0.15);
   border-color: var(--primary-color); /* Tint color on focus */
+}
+
+/* Custom Select Arrow */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 4.5 3 3 3-3'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px !important;
+  cursor: pointer;
+}
+
+.dark-theme select,
+[data-theme="dark"] select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m3 4.5 3 3 3-3'/%3E%3C/svg%3E");
+}
+
+/* Multiselect handling */
+select[multiple] {
+  background-image: none;
+  padding-right: 16px !important;
+  min-height: 100px;
 }
 
 /* --- Buttons (iOS Style) --- */
@@ -173,22 +225,31 @@ button.btn {
   #app {
     padding: 1.5rem 1rem;
   }
-  
-  h1 { font-size: 2rem; }
-  h2 { font-size: 1.5rem; }
-  h3 { font-size: 1.25rem; }
-  
-  input, textarea, select {
+
+  h1 {
+    font-size: 2rem;
+  }
+  h2 {
+    font-size: 1.5rem;
+  }
+  h3 {
+    font-size: 1.25rem;
+  }
+
+  input,
+  textarea,
+  select {
     font-size: 16px; /* Prevents zoom on iOS */
     padding: 10px 14px;
   }
-  
+
   button.btn {
     padding: 10px 20px;
     font-size: 0.95rem;
   }
-  
-  .card, .glass-panel {
+
+  .card,
+  .glass-panel {
     border-radius: 16px;
     padding: 1rem;
   }
@@ -198,16 +259,23 @@ button.btn {
   #app {
     padding: 1rem 0.75rem;
   }
-  
-  h1 { font-size: 1.75rem; }
-  h2 { font-size: 1.35rem; }
-  h3 { font-size: 1.15rem; }
-  
-  .card, .glass-panel {
+
+  h1 {
+    font-size: 1.75rem;
+  }
+  h2 {
+    font-size: 1.35rem;
+  }
+  h3 {
+    font-size: 1.15rem;
+  }
+
+  .card,
+  .glass-panel {
     border-radius: 14px;
     padding: 0.85rem;
   }
-  
+
   button.btn {
     padding: 8px 16px;
     font-size: 0.9rem;
@@ -215,17 +283,35 @@ button.btn {
 }
 
 /* --- Utility Classes --- */
-.text-center { text-align: center; }
-.text-muted { color: var(--text-muted); }
-.text-danger { color: var(--danger-color); }
-.text-success { color: var(--success-color); }
+.text-center {
+  text-align: center;
+}
+.text-muted {
+  color: var(--text-muted);
+}
+.text-danger {
+  color: var(--danger-color);
+}
+.text-success {
+  color: var(--success-color);
+}
 
-.mt-1 { margin-top: 0.5rem; }
-.mt-2 { margin-top: 1rem; }
-.mb-1 { margin-bottom: 0.5rem; }
-.mb-2 { margin-bottom: 1rem; }
+.mt-1 {
+  margin-top: 0.5rem;
+}
+.mt-2 {
+  margin-top: 1rem;
+}
+.mb-1 {
+  margin-bottom: 0.5rem;
+}
+.mb-2 {
+  margin-bottom: 1rem;
+}
 
-.hidden { display: none; }
+.hidden {
+  display: none;
+}
 
 /* Loading spinner */
 .spinner {
@@ -239,7 +325,9 @@ button.btn {
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .loading-state {

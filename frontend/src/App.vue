@@ -4,7 +4,7 @@
 
     <!-- Floating Theme Toggle (Glass Circle) -->
     <button class="theme-toggle hover-lift" @click="toggleTheme" :title="isDark ? 'Modo Claro' : 'Modo Oscuro'">
-        <font-awesome-icon :icon="isDark ? 'sun' : 'moon'" />
+      <font-awesome-icon :icon="isDark ? 'sun' : 'moon'" />
     </button>
 
     <header>
@@ -13,13 +13,13 @@
       <!-- User Info Pill -->
       <transition name="fade">
         <div v-if="authStore.user" class="user-info hover-lift">
-            <span class="user-avatar">
-                <font-awesome-icon icon="user" />
-            </span>
-            <span class="user-welcome">Hola, <strong>{{ authStore.user.username }}</strong></span>
-            <button @click="handleLogout" class="btn-logout" title="Cerrar Sesión">
-                <font-awesome-icon icon="right-from-bracket" />
-            </button>
+          <span class="user-avatar">
+            <font-awesome-icon icon="user" />
+          </span>
+          <span class="user-welcome">Hola, <strong>{{ authStore.user.username }}</strong></span>
+          <button @click="handleLogout" class="btn-logout" title="Cerrar Sesión">
+            <font-awesome-icon icon="right-from-bracket" />
+          </button>
         </div>
         <p v-else class="subtitle">Explora y gestiona tus tareas con estilo.</p>
       </transition>
@@ -34,7 +34,7 @@
     </main>
 
     <footer>
-      <p>Diseñado con <font-awesome-icon icon="heart" class="icon-heart" /> y Copilot</p>
+      <p>Diseñado con <font-awesome-icon icon="heart" class="icon-heart" /> por IvnLinares</p>
     </footer>
   </div>
 </template>
@@ -90,29 +90,29 @@ header h1 {
 
 /* --- Theme Toggle --- */
 .theme-toggle {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 1000;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 1px solid var(--glass-border);
-    background: var(--glass-surface);
-    backdrop-filter: blur(var(--glass-blur));
-    box-shadow: var(--glass-shadow);
-    font-size: 1.2rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    color: var(--text-color);
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+  font-size: 1.2rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  color: var(--text-color);
 }
 
 .theme-toggle:hover {
   transform: translateY(-2px) rotate(15deg);
-  box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 /* --- User Info Pill (Glass) --- */
@@ -122,12 +122,13 @@ header h1 {
   align-items: center;
   gap: 1rem;
   padding: 0.6rem 0.8rem 0.6rem 0.6rem;
-  border-radius: 50px; /* Full pill */
+  border-radius: 50px;
+  /* Full pill */
 
   background: var(--glass-surface);
   backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .user-avatar {
@@ -161,7 +162,8 @@ header h1 {
 }
 
 .btn-logout:hover {
-  background: rgba(255, 59, 48, 0.1); /* Red tint */
+  background: rgba(255, 59, 48, 0.1);
+  /* Red tint */
   color: var(--danger-color);
 }
 
@@ -172,9 +174,21 @@ header h1 {
 }
 
 @keyframes heartbeat {
-  0%, 100% { transform: scale(1); }
-  20%, 40% { transform: scale(1.1); }
-  30%, 50% { transform: scale(1); }
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  20%,
+  40% {
+    transform: scale(1.1);
+  }
+
+  30%,
+  50% {
+    transform: scale(1);
+  }
 }
 
 /* --- Page Transitions --- */
@@ -211,18 +225,18 @@ footer {
     top: 15px;
     right: 15px;
   }
-  
+
   header h1 {
     flex-direction: column;
     gap: 0.3rem;
   }
-  
+
   .user-info {
     flex-wrap: wrap;
     justify-content: center;
     gap: 0.5rem;
   }
-  
+
   .user-welcome {
     font-size: 0.85rem;
   }
@@ -233,13 +247,13 @@ footer {
     padding: 0.5rem;
     margin-bottom: 2rem;
   }
-  
+
   .theme-toggle {
     width: 40px;
     height: 40px;
     font-size: 1rem;
   }
-  
+
   footer {
     padding: 2rem 0;
     margin-top: 3rem;
