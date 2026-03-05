@@ -8,42 +8,18 @@ export default defineConfig({
     vue(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+      strategies: 'generateSW',
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
+      },
+      includeAssets: ['favicon.ico'],
       manifest: {
         name: 'Copilot Task Manager',
         short_name: 'Copilot Tasks',
         description: 'Gestor de tareas inteligente con PWA',
         theme_color: '#6366f1',
         background_color: '#f8fafc',
-        icons: [
-          {
-            src: 'pwa-192x192.png',
-            sizes: '192x192',
-            type: 'image/png'
-          },
-          {
-            src: 'pwa-512x512.png',
-            sizes: '512x512',
-            type: 'image/png'
-          }
-        ]
-      },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        runtimeCaching: [
-          {
-            urlPattern: /^\/api\/.*/,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 // 1 day
-              },
-              networkTimeoutSeconds: 10
-            }
-          }
-        ]
+        icons: []
       }
     })
   ],
