@@ -158,19 +158,23 @@ serve(async (req) => {
   try {
     const userId = getAuthUser(req)
     if (!userId) {
+      console.error("Auth failed: userId is null")
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
 
+    console.log("Authenticated user:", userId)
     const url = new URL(req.url)
     const taskId = parseInt(url.pathname.split("/").pop()!)
 
     let result
 
     if (req.method === "GET") {
+      console.log("GET request - taskId:", taskId)
       if (taskId && !isNaN(taskId)) {
+        console.log("Fetching single task:", taskId)
         const { data, error } = await supabase
           .from("tasks")
           .select("*")
@@ -178,19 +182,30 @@ serve(async (req) => {
           .eq("user_id", userId)
           .single()
 
-        result = error ? { error: error.message, status: 404 } : { task: data, status: 200 }
+        if (error) {
+          console.error("Single task fetch error:", error.message)
+          result = { error: error.message, status: 404 }
+        } else {
+          console.log("Single task found:", taskId)
+          result = { task: data, status: 200 }
+        }
       } else {
+        console.log("Fetching all tasks")
         result = await getTasks(userId)
       }
     } else if (req.method === "POST") {
+      console.log("POST task for user:", userId)
       const body = await req.json()
       result = await createTask(userId, body)
     } else if (req.method === "PUT") {
+      console.log("PUT task for user:", userId, "taskId:", taskId)
       const body = await req.json()
       result = await updateTask(userId, taskId, body)
     } else if (req.method === "DELETE") {
+      console.log("DELETE task for user:", userId, "taskId:", taskId)
       result = await deleteTask(userId, taskId)
     } else {
+      console.log("Unsupported method:", req.method)
       result = { error: "Method not allowed", status: 405 }
     }
 
@@ -202,6 +217,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
+    console.error("Catch block error:", error.message, error.stack)
     return new Response(
       JSON.stringify({ error: error.message }),
       {
@@ -211,3 +227,4 @@ serve(async (req) => {
     )
   }
 })
+

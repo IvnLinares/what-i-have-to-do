@@ -46,26 +46,36 @@ serve(async (req) => {
   try {
     const userId = getAuthUser(req)
     if (!userId) {
+      console.error("Auth failed: userId is null")
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       )
     }
 
+    console.log("Authenticated user:", userId)
     const url = new URL(req.url)
     const id = parseInt(url.pathname.split("/").pop()!)
 
     let result
 
     if (req.method === "GET") {
+      console.log("GET categories for user:", userId)
       const { data, error } = await supabase
         .from("categories")
         .select("*")
         .eq("user_id", userId)
         .order("name")
 
-      result = error ? { error: error.message, status: 400 } : { categories: data || [], status: 200 }
+      if (error) {
+        console.error("Database error:", error.message)
+        result = { error: error.message, status: 400 }
+      } else {
+        console.log("Found categories:", data?.length || 0)
+        result = { categories: data || [], status: 200 }
+      }
     } else if (req.method === "POST") {
+      console.log("POST category for user:", userId)
       const body = await req.json()
       const { data, error } = await supabase
         .from("categories")
@@ -73,8 +83,15 @@ serve(async (req) => {
         .select()
         .single()
 
-      result = error ? { error: error.message, status: 400 } : { category: data, status: 201 }
+      if (error) {
+        console.error("Insert error:", error.message)
+        result = { error: error.message, status: 400 }
+      } else {
+        console.log("Category created:", data?.id || "unknown")
+        result = { category: data, status: 201 }
+      }
     } else if (req.method === "PUT") {
+      console.log("PUT category for user:", userId)
       const body = await req.json()
       const { data, error } = await supabase
         .from("categories")
@@ -84,15 +101,30 @@ serve(async (req) => {
         .select()
         .single()
 
-      result = error ? { error: error.message, status: 400 } : { category: data, status: 200 }
+      if (error) {
+        console.error("Update error:", error.message)
+        result = { error: error.message, status: 400 }
+      } else {
+        console.log("Category updated:", id)
+        result = { category: data, status: 200 }
+      }
     } else if (req.method === "DELETE") {
+      console.log("DELETE category for user:", userId)
       const { error } = await supabase
         .from("categories")
         .delete()
         .eq("id", id)
         .eq("user_id", userId)
 
-      result = error ? { error: error.message, status: 400 } : { status: 200 }
+      if (error) {
+        console.error("Delete error:", error.message)
+        result = { error: error.message, status: 400 }
+      } else {
+        console.log("Category deleted:", id)
+        result = { status: 200 }
+      }
+    } else {
+      result = { error: "Method not allowed", status: 405 }
     }
 
     return new Response(
@@ -103,6 +135,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
+    console.error("Catch block error:", error.message, error.stack)
     return new Response(
       JSON.stringify({ error: error.message }),
       {
