@@ -25,7 +25,8 @@
         <div v-if="showSettings" class="settings-drawer">
             <CategoryManager />
             <TagManager />
-            <IntegrationManager />
+            <!-- IntegrationManager coming in next version -->
+            <!-- <IntegrationManager /> -->
         </div>
     </transition>
 
@@ -273,7 +274,7 @@ import { useCategoryStore } from '../stores/categoryStore'
 import { useTagStore } from '../stores/tagStore'
 import CategoryManager from './CategoryManager.vue'
 import TagManager from './TagManager.vue'
-import IntegrationManager from './IntegrationManager.vue'
+// import IntegrationManager from './IntegrationManager.vue' // Coming in next version
 import TaskCalendar from './TaskCalendar.vue'
 import TaskSearch from './TaskSearch.vue'
 
