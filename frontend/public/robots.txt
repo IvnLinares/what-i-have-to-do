@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://ivnlinares.github.io/what-i-have-to-do/sitemap.xml

@@ -40,15 +40,26 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from './stores/authStore'
 import { useTheme } from './composables/useTheme'
 import ReloadPrompt from './components/ReloadPrompt.vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
+const route = useRoute()
 const { isDark, toggleTheme } = useTheme()
+
+// Dynamic Title Handling
+const BASE_TITLE = 'What I have to do?'
+watch(
+  () => route.meta.title,
+  (newTitle) => {
+    document.title = newTitle ? `${newTitle} | ${BASE_TITLE}` : BASE_TITLE
+  },
+  { immediate: true }
+)
 
 const handleLogout = () => {
   authStore.logout()

@@ -8,12 +8,13 @@ const routes = [
     path: '/',
     name: 'Home',
     component: TaskManager,
-    meta: { requiresAuth: true }
+    meta: { requiresAuth: true, title: 'Mis Tareas' }
   },
   {
     path: '/login',
     name: 'Login',
-    component: Login
+    component: Login,
+    meta: { title: 'Iniciar Sesión' }
   }
 ]
 

@@ -18,7 +18,7 @@ export default defineConfig({
       manifest: {
         name: 'What I Have To Do',
         short_name: 'ToDo',
-        description: 'Gestor de tareas inteligente con PWA',
+        description: 'Gestiona tus tareas con estilo. Un gestor de tareas inteligente, minimalista y potente.',
         theme_color: '#6366f1',
         background_color: '#f8fafc',
         icons: []
