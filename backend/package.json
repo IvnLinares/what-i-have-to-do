@@ -26,7 +26,7 @@
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
     "passport-oidc": "^0.0.1",
-    "sqlite3": "^5.1.7",
+    "pg": "^8.20.0",
     "tsdav": "^2.1.7",
     "web-push": "^3.6.7",
     "zod": "^4.3.6"
